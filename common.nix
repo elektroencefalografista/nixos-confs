@@ -5,10 +5,9 @@
 {
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
 	time.timeZone = "Europe/Warsaw";
-
 	programs.bash.interactiveShellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";
-
 	security.sudo.wheelNeedsPassword = false; # appearently thats outdated
+
 	users.users.drath = {
 		isNormalUser = true;
 		description = "drath";
@@ -63,6 +62,19 @@
 			};
 		};
 
+	};
+
+	nix = {
+		settings.auto-optimise-store = true;
+		gc = {
+			automatic = true;
+			dates = "weekly";
+			options = "--delete-older-than 30d";
+		};
+		extraOptions = ''
+			min-free = ${toString (100 * 1024 * 1024)}
+			max-free = ${toString (1024 * 1024 * 1024)}
+		'';
 	};
 
 	services.openssh = {
