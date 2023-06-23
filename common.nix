@@ -1,3 +1,5 @@
+# common config options that genereally dont change often
+
 { config, pkgs, ... }:
 
 {
