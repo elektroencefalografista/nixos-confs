@@ -13,4 +13,18 @@ console.keyMap = "pl2";					# not using console all that much
 				};
 			};
 		};
+
+		services.prometheus = {
+			enable = true;
+			scrapeConfigs = [{
+				job_name = "telegraf";
+				static_configs = [{
+					targets = [ "127.0.0.1:9273" ];
+				}];
+			}];
+			extraFlags = [
+				"--storage.tsdb.retention.size=8GB"
+				"--storage.tsdb.path=/var/promdb/" # TODO move
+			];
+		};
 }
