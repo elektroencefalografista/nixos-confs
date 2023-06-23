@@ -1,10 +1,4 @@
-# TODO add actual firewall rules. we need:
-#		- port 80 for pihole
-#		- port 82 for rclone thing
-#		- ports 3000 for grafana and 9090 for prometheus datasource
-# TODO oh wait, cant have common rclone downloader for pi becuase it downloads from pi. ig no google backups for pi
-# but also i only really need to backup pihole settings so eh
-# maybe we could do that with home manager?
+# TODO figure out how to backup/provision basic settings for pihole
 # TODO flask gcs downloader with nix insted of docker. time to learn flakes ig
 
 
@@ -32,7 +26,9 @@
 		defaultGateway = "192.168.1.254";
 		nameservers = [ "127.0.0.1" ];
 		hostName = "rpi";
-		firewall.enable = false; # yea no
+		# firewall.enable = false; # yea no
+		firewall.allowedTCPPorts = [ 53 67 80 82 3000 ]; # port 81 still works?
+		firewall.allowedUDPPorts = [ 53 67 547 ];
 	};
 
 	swapDevices = [{
