@@ -49,10 +49,9 @@
 			};
 		};
 
-
 		timers = {
 			backup-configs = {
-				enable = true;
+				enable = true; # maybe it would be better to explicitly include systemd.user.timers.backup-configs.enable = true; in each host
 				wantedBy = [ "timers.target" ];
 				description = "Timer to backup scripts and configs to google drive";
 				timerConfig = {
