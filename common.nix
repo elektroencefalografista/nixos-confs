@@ -38,8 +38,10 @@
 
 	services.openssh = {
 		enable = true;
-		settings.PasswordAuthentication = false;
-		permitRootLogin = "no";
+		settings = {
+			PermitRootLogin = "no";
+			PasswordAuthentication = false;
+		};
 		extraConfig = "AllowUsers drath@192.168.1.*\nAllowUsers drath@100.*";
 	};
 
