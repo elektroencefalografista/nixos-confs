@@ -19,7 +19,7 @@ in
 {
 	imports = [
 		./hardware-configuration.nix
-		(fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master") # what do
+		(fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master")
 		(builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
 	];
 
@@ -54,6 +54,7 @@ in
 	
 	environment.variables = {
 		DOCKER_CONF_DIR = "$HOME/configs";
+		DOCKER_STORAGE_DIR = "/mnt/zpool/.docker-storage"; # maybe we should make it a nix variable for other services i port from docker
 		TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
 		EDITOR = "nano";
 		XZ_DEFAULTS = "-T0";
