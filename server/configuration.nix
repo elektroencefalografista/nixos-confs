@@ -58,7 +58,7 @@ in
 		TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
 		EDITOR = "nano";
 		XZ_DEFAULTS = "-T0";
-		MAIN_NET_IFACE = "$(ip link | grep -Eo \"enp[1-9]s0\")";
+		MAIN_NET_IFACE = "$(ip link | grep -Eo \"enp[1-9]s0\")"; # am i even using this anymore?
 	};
 
 

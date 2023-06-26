@@ -14,7 +14,7 @@ console.keyMap = "pl2";								# not using console all that much
 			};
 		};
 
-		# moving the db is a pain in the ass, unless i move it to /mnt/zpool? # TODO?
+		# tsdb path is hardcoded to be under /var/lib, have to use docker
 		services.prometheus = {
 			enable = true;
 			scrapeConfigs = [{
@@ -25,7 +25,7 @@ console.keyMap = "pl2";								# not using console all that much
 			}];
 			extraFlags = [
 				"--storage.tsdb.retention.size=8GB"
-				"--storage.tsdb.path=/var/promdb/" # TODO move
+				"--storage.tsdb.path=/var/promdb/"
 			];
 		};
 }
