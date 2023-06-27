@@ -4,7 +4,7 @@ if ( $args[0] -eq  "rpi" ) {
 }
 
 if ( $args[0] -eq "server" ) {
-	$target = "drath@nox-test"
+	$target = "drath@nix-test"
 	scp server/configuration.nix ${target}:~/.tmp
 }
 

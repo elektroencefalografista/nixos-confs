@@ -1,7 +1,5 @@
 # TODO: we could PROBABLY move some of the critical services away from docker and into this: 
 # 		- cloudflared but i like it on a separate network with all the shit thats running off of it
-#		- ngrok maybe? no, needs python script to update cloudflare dns
-#		- telegraf + prometheus, or at least telegraf. needs access to everything anyway
 #		- maybe samba? nfs perchance? i like em in docker tho
 #		- portainer??? perchance
 
@@ -12,7 +10,11 @@
 
 let 
 	cfg = {
-		linuxVer = "linux_6_1";
+		hostname = "nix-test";
+		linuxVer = "linux_6_1"; # needed for extra kernel modules
+		zfs.arcSize = 1024;
+		mem.swapSize = 2048;
+		oneshotConfigDownloaderSource = "server";
 	};
 in
 
@@ -35,12 +37,12 @@ in
 		blacklistedKernelModules = [ "k10temp" ];
 		kernelModules = [ "nfs" "nfsd" "tun" "zenpower" "it87" ]; # not sure if i really need tun
 		supportedFilesystems = [ "zfs" "btrfs" ]; # zfs not strictly needed? need 2 test
-		kernelParams = [ "zfs.zfs_arc_min=0" "zfs.zfs_arc_max=${toString (3072 * 1048576)}" ]; # 1024 MB
+		kernelParams = [ "zfs.zfs_arc_min=0" "zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}" ];
 		tmp.cleanOnBoot = true;
 	};
 
 	networking = {
-		hostName = "nox-test"; # Define your hostname.
+		hostName = cfg.hostname;
 		hostId = "5c932f77"; # for zfs, needs to be random TODO test importing if pool created with a diff id
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
@@ -61,43 +63,9 @@ in
 	};
 
 
-	########### FILESYSTEMS ########### should i move zfs here?
-
-	# boot.zfs.extraPools = [ "zpool" ];
-
-	# fileSystems = {
-	# 	"/mnt/mfs_share" = {
-	# 		# device = "/dev/disk/by-uuid/cdb15f8d-7a83-4b33-aaf7-e4147261900a";
-	# 		fsType = "btrfs";
-	# 		options = [ 
-	# 			"relatime" 
-	# 			"nofail"
-	# 			"defaults"
-	# 			"x-systemd.mount-timeout=15" ];
-	# 	};
-
-	# 	"/mnt/anime" = {
-	# 		device = "/mnt/mfs_*:/mnt/zpool";
-	# 		fsType = "fuse.mergerfs";
-	# 		options = [ 
-	# 			"defaults" 
-	# 			"nonempty"
-	# 			"allow_other"
-	# 			"use_ino"
-	# 			"category.create=msplfs"
-	# 			"dropcacheonclose=true"
-	# 			"minfreespace=10G"
-	# 			"fsname=mfs_pool"
-	# 			"nofail" ];
-	# 		depends = [ "/mnt/zpool" "/mnt/mfs_anime" ];
-	# 		noCheck = true;
-	# 	};
-
-	# };
-
 	swapDevices = [ {
    		device = "/var/lib/swapfile";
-    	size = 2*1024; # 2GB
+    	size = cfg.mem.swapSize;
  	} ];
 
 	########### SOFTWARE and SERVICES ###########
@@ -167,7 +135,7 @@ in
 				serviceConfig.Type = "oneshot";
 				unitConfig.ConditionPathExists = "!%S/%N.stamp";
 				serviceConfig.RemainAfterExit = "yes";
-				scriptArgs = "%S %N server";
+				scriptArgs = "%S %N ${cfg.oneshotConfigDownloaderSource}";
 				script = ''
 					mkdir -p $1
 					rclone cat google:backup/$3/$3-docker-compose.tar.gz | pigz -d | tar -x -C ~ && \
@@ -209,9 +177,10 @@ in
 
 		timers = {
 			backup-configs = {
-				enable = true; # maybe it would be better to explicitly include systemd.user.timers.backup-configs.enable = true; in each host
+				enable = true;
 				wantedBy = [ "timers.target" ];
 				description = "Timer to backup scripts and configs to google drive";
+				requires = [ "backup-configs.service" ]; # fuck you
 				timerConfig = {
 					OnCalendar = "*-*-* 0,6,12,18:00:00";
 					Unit = "backup-configs.service";
