@@ -1,16 +1,14 @@
-# TODO: we could PROBABLY move some of the critical services away from docker and into this: 
-# 		- cloudflared but i like it on a separate network with all the shit thats running off of it
-#		- maybe samba? nfs perchance? i like em in docker tho
-#		- portainer??? perchance
-
 # HOW TF WAS KERNEL MODULES THIS EASY. this alone is enough of a reason to switch away from ubuntu 
 # TODO autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
+# TODO test zfs hostId and if i can remove some of zfs related options
+# go through the config in general and see if i can remove some shit
 
 { config, pkgs, ... }:
 
 let 
 	cfg = {
 		hostname = "nix-test";
+		username = "drath";
 		linuxVer = "linux_6_1"; # needed for extra kernel modules
 		zfs.arcSize = 1024;
 		mem.swapSize = 2048;
@@ -24,9 +22,6 @@ in
 		(fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master")
 		(builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
 	];
-
-	########### BASICS and NETWORKING ###########
-
 
 	boot = {
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
@@ -80,7 +75,7 @@ in
 	];
 
 	services = {
-		# getty.autologinUser = "drath";
+		# getty.autologinUser = cfg.username;
 		timesyncd.enable = true;
 		tailscale.enable = true; # still need to join by hand but thats probably fine
 		vscode-server.enable = true;
@@ -125,7 +120,7 @@ in
 		};
 	};
 
-
+	####### USER SERVICES (basically only one-shots) #######
 	systemd.user = {
 		services = {
 			oneshot-config-downloader = {
@@ -158,14 +153,25 @@ in
 					mkdir -p $1/rclone
 					curl -sSL 192.168.1.1:82/?q=rclone.conf | base64 -d | gzip -d > $1/rclone/rclone.conf
 				'';
-				description = "Download homedir files from google drive";
+				description = "Download rclone config";
 				wantedBy = [ "default.target" ]; # this is what actually makes it run on boot
 			};
-
+		};
+	};
+	
+	####### SYSTEM SERVICES (backups) ######
+	# backups could be a user service, but that needs lingering and thats not supported on nixos yet
+	# for 7 years
+	# would be neater if this was a template service
+	systemd = {
+		services = {
 			backup-configs = {
 				enable = true;
 				path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
-				serviceConfig.Type = "oneshot";
+				serviceConfig = {
+					Type = "oneshot";
+					User = cfg.username;
+				};
 				description = "Backup scripts and configs to google drive";
 				script = ''
 					cd ~; tar -cvf - configs | pigz | rclone rcat google:backup/$HOSTNAME/$HOSTNAME-configs.tar.gz
