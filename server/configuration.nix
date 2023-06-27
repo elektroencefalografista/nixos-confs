@@ -35,8 +35,7 @@ in
 		blacklistedKernelModules = [ "k10temp" ];
 		kernelModules = [ "nfs" "nfsd" "tun" "zenpower" "it87" ]; # not sure if i really need tun
 		supportedFilesystems = [ "zfs" "btrfs" ]; # zfs not strictly needed? need 2 test
-		# zfs.extraPools = [ "zpool" ];
-		kernelParams = [ "zfs.zfs_arc_min=0" "zfs.zfs_arc_max=1073741824" ]; # 1GB
+		kernelParams = [ "zfs.zfs_arc_min=0" "zfs.zfs_arc_max=${toString (3072 * 1048576)}" ]; # 1024 MB
 		tmp.cleanOnBoot = true;
 	};
 
@@ -45,7 +44,7 @@ in
 		hostId = "5c932f77"; # for zfs, needs to be random TODO test importing if pool created with a diff id
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
-		firewall.enable = false; # yea no
+		firewall.enable = false; # yea no. gotta figure out what ports i need
 	};
 
 
@@ -58,16 +57,17 @@ in
 		TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
 		EDITOR = "nano";
 		XZ_DEFAULTS = "-T0";
-		MAIN_NET_IFACE = "$(ip link | grep -Eo \"enp[1-9]s0\")"; # am i even using this anymore?
+		# MAIN_NET_IFACE = "$(ip link | grep -Eo \"enp[1-9]s0\")"; # am i even using this anymore?
 	};
 
 
 	########### FILESYSTEMS ########### should i move zfs here?
 
+	# boot.zfs.extraPools = [ "zpool" ];
+
 	# fileSystems = {
 	# 	"/mnt/mfs_share" = {
 	# 		# device = "/dev/disk/by-uuid/cdb15f8d-7a83-4b33-aaf7-e4147261900a";
-	# 		device = "/dev/disk/by-uuid/243283da-bd51-4018-8177-2c9e35b6b30a";
 	# 		fsType = "btrfs";
 	# 		options = [ 
 	# 			"relatime" 
@@ -106,7 +106,6 @@ in
 		vim
 		wget
 		htop
-		# rclone # dont REALLY need it? since its defined in systemd pkgs anyway
 		neofetch
 		mergerfs
 		lm_sensors
