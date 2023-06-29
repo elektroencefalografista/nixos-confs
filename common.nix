@@ -7,7 +7,7 @@ let
 in
 
 
-{ cfg, config, pkgs,  ... }:
+{ config, pkgs,  ... }:
 
 {
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
