@@ -1,6 +1,6 @@
 # common config options that genereally dont change often
 
-{ config, pkgs, vars, ... }:
+{ config, pkgs,  ... }:
 
 {
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
