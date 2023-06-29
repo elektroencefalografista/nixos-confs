@@ -1,5 +1,12 @@
 # common config options that genereally dont change often
 
+let 
+	cfg = {
+		username = "drath";
+	};
+in
+
+
 { cfg, config, pkgs,  ... }:
 
 {
