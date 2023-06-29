@@ -1,6 +1,6 @@
 # common config options that genereally dont change often
 
-{ config, pkgs, ... }:
+{ config, pkgs, cfg, ... }:
 
 {
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
@@ -43,8 +43,8 @@
 			PasswordAuthentication = false;
 		};
 		extraConfig = ''
-			AllowUsers drath@192.168.1.*
-			AllowUsers drath@100.*";
+			AllowUsers ${cfg.username}@192.168.1.*
+			AllowUsers ${cfg.username}@100.*"
 		'';
 	};
 
