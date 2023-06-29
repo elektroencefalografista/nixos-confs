@@ -42,7 +42,10 @@
 			PermitRootLogin = "no";
 			PasswordAuthentication = false;
 		};
-		extraConfig = "AllowUsers ${cfg.username}@192.168.1.*\nAllowUsers ${cfg.username}@100.*";
+		extraConfig = ''
+			AllowUsers drath@192.168.1.*
+			AllowUsers drath@100.*";
+		'';
 	};
 
 	system.autoUpgrade = {
