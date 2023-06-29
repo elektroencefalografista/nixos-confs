@@ -1,6 +1,6 @@
 # common config options that genereally dont change often
 
-{ vars, config, pkgs,  ... }:
+{ cfg, config, pkgs,  ... }:
 
 {
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
@@ -8,9 +8,9 @@
 	programs.bash.interactiveShellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";
 	security.sudo.wheelNeedsPassword = false; # appearently thats outdated
 
-	users.users."${vars.username}" = {
+	users.users."${cfg.username}" = {
 		isNormalUser = true;
-		description = vars.username;
+		description = cfg.username;
 		extraGroups = [ "networkmanager" "wheel" "docker" ];
 		openssh.authorizedKeys.keys = [
 			"ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQCzDj37fIBKkVd+b1rq5HhgS2GBiIEIh7L/09XwFPw+OsY6IqNji51HDJape6XuOzc1ey7HuQNX64JsHM8fFJFXm8J3prhIP0MwnJgPLtXxOBLGL5x5JTw1yeAYZXEykB4W32rtqqXDhq8gU3/49w6N+wcMpn1XcsTMPlL8eeavTQlvVlHzr8ijiDO+teval8+0KtGvPOGwMNs+otFauh8DAZI/5bFk1yDxaZo2C6tlKmLATjbqx3CdUXdiA4auzpDHb4q+AZywPflJIaEHLXv+FDax/pW9eoKBEYVtrxJHYQvaog9vCm1ZS6a2kyJpFuUBN0EWtkE5WXv11mkh+DwR5zmllIVyB+BNdxERWixXEc9Hh7pgjkc7Yc2VrSexrPrmJsXU/g2lL5+v8PGZb6JBr4Z7WM99Yhf2JbLpiJ2EPB/ynqnO+bvs7Ik5pPW8pHpXUwaKu/AaKRLbE3sSHpXD/25M9B9wP4AduASqQkCXNT/U0AgpEyV1weys7UGgHns= drath@MOTHERSHIP"
@@ -43,8 +43,8 @@
 			PasswordAuthentication = false;
 		};
 		extraConfig = ''
-			AllowUsers ${vars.username}@192.168.1.*
-			AllowUsers ${vars.username}@100.*"
+			AllowUsers ${cfg.username}@192.168.1.*
+			AllowUsers ${cfg.username}@100.*"
 		'';
 	};
 
