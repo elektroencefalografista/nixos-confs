@@ -14,6 +14,7 @@ let
 in
 
 {	
+	
 	imports = [
 		./hardware-configuration.nix
 		(builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
@@ -35,7 +36,6 @@ in
 		defaultGateway = "192.168.1.254";
 		nameservers = [ "127.0.0.1" ];
 		hostName = cfg.hostname;
-		# firewall.enable = false; # yea no
 		firewall.allowedTCPPorts = [ 53 67 80 82 3000 ]; # port 81 still works?
 		firewall.allowedUDPPorts = [ 53 67 547 ];
 	};
@@ -46,7 +46,6 @@ in
 	}];
 
 	environment.systemPackages = with pkgs; [
-		wget
 		htop
 		neofetch
 		libraspberrypi
@@ -64,13 +63,12 @@ in
 					type = "prometheus";
 					url = "http://server.lan:9090";
 				}];
-				# dashboards.path = "/path"; #TODO?
+				# dashboards.path = "/path"; # maybe we could have a default, read-only dashboard? TODO?
 			};
 			settings = {
 				server = {
 					http_addr = "0.0.0.0";
 					http_port = 3000;
-					# domain = "grafana.drath.cc";
 				};
 				security = {
 					admin_user = "drath";
@@ -85,7 +83,7 @@ in
 		services = {
 			backup-configs = {
 				enable = true;
-				path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
+				path = with pkgs; [ pigz gnutar rclone ];
 				serviceConfig = {
 					Type = "oneshot";
 					User = cfg.username;
@@ -104,7 +102,7 @@ in
 				enable = true;
 				wantedBy = [ "timers.target" ];
 				description = "Timer to backup scripts and configs to google drive";
-				requires = [ "backup-configs.service" ]; # fuck you
+				requires = [ "backup-configs.service" ];
 				timerConfig = {
 					OnCalendar = "*-*-* 0,6,12,18:00:00";
 					Unit = "backup-configs.service";
