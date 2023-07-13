@@ -48,6 +48,7 @@ in
 	environment.systemPackages = with pkgs; [
 		htop
 		neofetch
+		git
 		libraspberrypi
 	];
 
