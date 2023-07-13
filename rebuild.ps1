@@ -1,5 +1,5 @@
 if ( $args[0] -eq  "rpi" ) {
-	$target = "drath@192.168.1.1"
+	$target = "drath@rpi"
 	scp rpi/rpi.nix ${target}:~/.tmp
 }
 
