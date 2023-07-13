@@ -1,7 +1,7 @@
 # HOW TF WAS KERNEL MODULES THIS EASY. this alone is enough of a reason to switch away from ubuntu 
 # TODO autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
-# TODO test zfs hostId and if i can remove some of zfs related options
 # go through the config in general and see if i can remove some shit
+# TODO maybe we dont want to pull common.nix from the network? kind of a pain in the ass
 
 { config, pkgs, ... }:
 
@@ -30,18 +30,72 @@ in
 			efi.canTouchEfiVariables = true;
 		};
 		blacklistedKernelModules = [ "k10temp" ];
-		kernelModules = [ "nfs" "nfsd" "tun" "zenpower" "it87" ]; # not sure if i really need tun
-		supportedFilesystems = [ "zfs" "btrfs" ]; # zfs not strictly needed? need 2 test
-		kernelParams = [ "zfs.zfs_arc_min=0" "zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}" ];
+		kernelModules = [ "zenpower" "it87" ];
+		supportedFilesystems = [ "zfs" "btrfs" ];
+		kernelParams = [ 
+			"zfs.zfs_arc_min=0"
+			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}" 
+		];
 		tmp.cleanOnBoot = true;
 	};
 
 	networking = {
 		hostName = cfg.hostname;
-		hostId = "5c932f77"; # for zfs, needs to be random TODO test importing if pool created with a diff id
+		hostId = "5c932f77"; # for zfs: importing a pool will fail if pool wasnt properly exported and the ID is different than the ID of the machine that the pool was last imported on
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
 		firewall.enable = false; # yea no. gotta figure out what ports i need
+	};
+
+	boot.zfs.extraPools = [ "zpool" ];
+
+	fileSystems = {
+		"/mnt/mfs_share" = {
+			device = "/dev/disk/by-uuid/cdb15f8d-7a83-4b33-aaf7-e4147261900a";
+			fsType = "btrfs";
+			options = [ 
+				"relatime" 
+				"nofail"
+				"defaults"
+				"x-systemd.mount-timeout=15" ];
+		};
+
+		"/mnt/mfs_anime" = {
+			device = "/dev/disk/by-uuid/f4ecfce7-0ff2-4f1f-9709-de874618fe58";
+			fsType = "btrfs";
+			options = [ 
+				"relatime" 
+				"nofail"
+				"defaults"
+				"x-systemd.mount-timeout=15" ];
+		};
+
+		"/mnt/mfs_purple" = {
+			device = "/dev/disk/by-uuid/557885a9-7107-43d2-bab8-109a36b351af";
+			fsType = "ext4";
+			options = [ 
+				"relatime" 
+				"nofail"
+				"defaults"
+				"x-systemd.mount-timeout=15" ];
+		};
+
+		"/mnt/anime" = {
+			device = "/mnt/mfs_*:/mnt/zpool";
+			fsType = "fuse.mergerfs";
+			options = [ 
+				"defaults" 
+				"nonempty"
+				"allow_other"
+				"use_ino"
+				"category.create=msplfs"
+				"dropcacheonclose=true"
+				"minfreespace=10G"
+				"fsname=mfs_pool"
+				"nofail" ];
+			depends = [ "/mnt/zpool" "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
+			noCheck = true;
+		};
 	};
 
 
@@ -54,7 +108,6 @@ in
 		TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
 		EDITOR = "nano";
 		XZ_DEFAULTS = "-T0";
-		# MAIN_NET_IFACE = "$(ip link | grep -Eo \"enp[1-9]s0\")"; # am i even using this anymore?
 	};
 
 
@@ -64,32 +117,56 @@ in
  	} ];
 
 	########### SOFTWARE and SERVICES ###########
-	virtualisation.docker.enable = true;
+	virtualisation.docker = {
+		enable = true;
+		listenOptions = [ "/run/docker.sock" "0.0.0.0:2375"  ];
+	};
+	
 	environment.systemPackages = with pkgs; [
 		vim
 		wget
 		htop
 		neofetch
 		mergerfs
+		nmap
 		lm_sensors
 	];
 
 	services = {
-		# getty.autologinUser = cfg.username;
+		getty.autologinUser = cfg.username;
 		timesyncd.enable = true;
 		tailscale.enable = true; # still need to join by hand but thats probably fine
-		vscode-server.enable = true;
+		# vscode-server.enable = true;
 		zfs.autoScrub.enable = true;
 
+		nfs = {
+			server = {
+				# enable = true;
+				enable = false;
+				exports = ''
+					/mnt 192.168.1.0/24(ro,fsid=0,no_subtree_check)
+					/mnt/anime 192.168.1.0/24(rw,fsid=1,sync,no_subtree_check,crossmnt)
+				'';
+			};
+			extraConfig = ''
+				[nfsd]
+				vers3=n
+			'';
+		};
+
 		telegraf = {
-			enable = true;
+			# enable = true;
+			enable = false;
 			extraConfig = {
 				inputs = {
 					mem = {};
 					cpu = {};
+					sensors = {};
+					system = {};
 					smart = {
 						path_smartctl = "${pkgs.smartmontools}/bin/smartctl";
 						path_nvme = "${pkgs.nvme-cli}/bin/nvme";
+						attributes = true;
 					};
 					docker = {
 						endpoint =  "unix://run/docker.sock";
