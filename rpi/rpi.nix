@@ -62,7 +62,7 @@ in
 				datasources.settings.datasources = [{
 					name = "Server";
 					type = "prometheus";
-					url = "http://server.lan:9090";
+					url = "http://localhost:9090";
 				}];
 				# dashboards.path = "/path"; # maybe we could have a default, read-only dashboard? TODO?
 			};
