@@ -1,6 +1,7 @@
-# TODO figure out how to backup/provision basic settings for pihole
+# TODO figure out how to backup/provision basic settings for pihole?
 # TODO flask gcs downloader with nix insted of docker. time to learn flakes ig
 # TODO gonna need rclone downloader. wont work on first boot when docker isnt setup, but it will work eventually
+# TODO backing up prometheus database somehow
 
 
 { config, pkgs, ... }:
@@ -36,7 +37,7 @@ in
 		defaultGateway = "192.168.1.254";
 		nameservers = [ "127.0.0.1" ];
 		hostName = cfg.hostname;
-		firewall.allowedTCPPorts = [ 53 67 80 82 3000 ]; # port 81 still works?
+		firewall.allowedTCPPorts = [ 53 67 80 82 3000 9090 ]; # port 81 still works?
 		firewall.allowedUDPPorts = [ 53 67 547 ];
 	};
 
@@ -45,15 +46,39 @@ in
 		size = cfg.mem.swapSize;
 	}];
 
-	environment.systemPackages = with pkgs; [
-		htop
-		neofetch
-		git
-		libraspberrypi
-	];
+	environment = {
+		etc = {
+			"cloudflared_tunnel.json" = {
+				mode = "0644";
+				source = "/home/${cfg.username}/configs/cloudflared/29bb852d-8363-4728-8acc-14fe66f5b8d8.json";
+			};
+		};
+
+		systemPackages = with pkgs; [
+			htop
+			neofetch
+			git
+			rsync
+			libraspberrypi
+		];
+	};
 
 	services = {
 		tailscale.enable = true; # TODO remove eventually?
+
+		cloudflared = {
+			enable = true;
+			tunnels = {
+				"29bb852d-8363-4728-8acc-14fe66f5b8d8" = {
+					credentialsFile = "/etc/cloudflared_tunnel.json";
+					default = "http_status:404";
+					ingress = {
+						"grafana.drath.cc" = "http://localhost:3000";
+						"portainer.drath.cc" = "https://localhost:9433"; # idk about making this one public
+					};
+				};
+			};
+		};
 
 		grafana = {
 			enable = true;
@@ -77,6 +102,25 @@ in
 				};
 			};
 
+		};
+
+		prometheus = {
+			enable = true;
+			retentionTime = "365d";
+			globalConfig = {
+				scrape_interval = "15s";
+				evaluation_interval = "15s";
+			};
+			scrapeConfigs = [{
+				job_name = "telegraf";
+				scrape_interval = "15s";
+				static_configs = [{
+					targets = [ "192.168.1.200:9273" ];
+				}];
+			}];
+			extraFlags = [
+				"--storage.tsdb.retention.size=8GB"
+			];
 		};
 	};
 
