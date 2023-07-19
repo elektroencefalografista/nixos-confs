@@ -1,7 +1,10 @@
-# HOW TF WAS KERNEL MODULES THIS EASY. this alone is enough of a reason to switch away from ubuntu 
-# TODO autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
+# TODO all nitpicks:
+#	- autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
+# 	- bash prompt?
+#	- maybe we dont want to pull common.nix from the network? kind of a pain in the ass
+
 # go through the config in general and see if i can remove some shit
-# TODO maybe we dont want to pull common.nix from the network? kind of a pain in the ass
+# FIXME look through again to remove any placeholders and replace with actual values for the actual deployment on the actual server
 
 { config, pkgs, ... }:
 
