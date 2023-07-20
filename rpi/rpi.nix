@@ -10,7 +10,7 @@ let
 	cfg = {
 		hostname = "rpi";
 		username = "drath";
-		mem.swapSize = 512;
+		mem.swapSize = 1024;
 	};
 in
 
@@ -75,6 +75,7 @@ in
 					ingress = {
 						"grafana.drath.cc" = "http://localhost:3000";
 						"portainer.drath.cc" = "https://localhost:9433"; # idk about making this one public
+						"precious.drath.cc" = "http://localhost:1111";
 					};
 				};
 			};
