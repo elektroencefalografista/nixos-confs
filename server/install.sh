@@ -1,6 +1,6 @@
 DISK="/dev/sda"
 ESP_SIZE="512MB"
-HOST="root@172.26.46.236"
+HOST="root@192.168.1.200"
 
 
 scp -o StrictHostKeychecking=no configuration.nix ${HOST}:/tmp/configuration.nix

@@ -10,11 +10,11 @@
 
 let 
 	cfg = {
-		hostname = "nix-test";
+		hostname = "server";
 		username = "drath";
 		linuxVer = "linux_6_1"; # needed for extra kernel modules
-		zfs.arcSize = 1024;
-		mem.swapSize = 2048;
+		zfs.arcSize = 4096;
+		mem.swapSize = 4096;
 		oneshotConfigDownloaderSource = "server";
 	};
 in
@@ -131,6 +131,7 @@ in
 		htop
 		neofetch
 		mergerfs
+		rclone
 		nmap
 		lm_sensors
 	];
@@ -139,13 +140,12 @@ in
 		getty.autologinUser = cfg.username;
 		timesyncd.enable = true;
 		tailscale.enable = true; # still need to join by hand but thats probably fine
-		# vscode-server.enable = true;
+		vscode-server.enable = true;
 		zfs.autoScrub.enable = true;
 
 		nfs = {
 			server = {
-				# enable = true;
-				enable = false;
+				enable = true;
 				exports = ''
 					/mnt 192.168.1.0/24(ro,fsid=0,no_subtree_check)
 					/mnt/anime 192.168.1.0/24(rw,fsid=1,sync,no_subtree_check,crossmnt)
@@ -158,8 +158,7 @@ in
 		};
 
 		telegraf = {
-			# enable = true;
-			enable = false;
+			enable = true;
 			extraConfig = {
 				inputs = {
 					mem = {};
@@ -167,12 +166,10 @@ in
 					sensors = {};
 					system = {};
 					smart = {
-						path_smartctl = "${pkgs.smartmontools}/bin/smartctl";
-						path_nvme = "${pkgs.nvme-cli}/bin/nvme";
 						attributes = true;
 					};
 					docker = {
-						endpoint =  "unix://run/docker.sock";
+						endpoint =  "unix:///run/docker.sock";
   						perdevice = false;
   						total = true;
   						total_include = [ "cpu" "blkio" "network" ];
@@ -245,6 +242,7 @@ in
 	# would be neater if this was a template service
 	systemd = {
 		services = {
+			telegraf.path = [ pkgs.lm_sensors pkgs.smartmontools pkgs.nvme-cli ];
 			backup-configs = {
 				enable = true;
 				path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
@@ -276,6 +274,7 @@ in
 	};
 
 	system.stateVersion = "23.05";
+	powerManagement.cpuFreqGovernor = "powersave";
 
 
 	##### TESTING FLAKES BELOW

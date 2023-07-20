@@ -1,12 +1,21 @@
 if ( $args[0] -eq  "rpi" ) {
-	$target = "drath@192.168.1.1"
+	$target = "drath@rpi"
 	scp rpi/rpi.nix ${target}:~/.tmp
 }
 
 if ( $args[0] -eq "server" ) {
-	$target = "drath@nix-test"
+	$target = "drath@server.lan"
 	scp server/configuration.nix ${target}:~/.tmp
 }
 
+if ( $args[0] -eq "atom" ) {
+	$target = "drath@192.168.1.1"
+	scp atom/configuration.nix ${target}:~/.tmp
+}
+
+if ( $args[0] -eq "test" ) {
+	$target = "drath@172.26.46.236"
+	scp server/conf2.nix ${target}:~/.tmp
+}
 
 ssh ${target} 'sudo mv ~/.tmp /etc/nixos/configuration.nix && sudo nixos-rebuild switch'
