@@ -22,8 +22,9 @@ in
 {
 	imports = [
 		./hardware-configuration.nix
+		./common.nix
 		(fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master")
-		(builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
+		# (builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
 	];
 
 	boot = {
@@ -131,7 +132,6 @@ in
 		htop
 		neofetch
 		mergerfs
-		rclone
 		nmap
 		lm_sensors
 	];
@@ -242,7 +242,14 @@ in
 	# would be neater if this was a template service
 	systemd = {
 		services = {
-			telegraf.path = [ pkgs.lm_sensors pkgs.smartmontools pkgs.nvme-cli ];
+			telegraf = { # hack to make smartctl work
+				path = [ pkgs.lm_sensors pkgs.smartmontools pkgs.nvme-cli ];
+				serviceConfig = {
+					User = pkgs.lib.mkForce "root";
+					Group = pkgs.lib.mkForce "root";
+				};
+			};
+
 			backup-configs = {
 				enable = true;
 				path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
@@ -274,7 +281,7 @@ in
 	};
 
 	system.stateVersion = "23.05";
-	powerManagement.cpuFreqGovernor = "powersave";
+	powerManagement.cpuFreqGovernor = "conservative";
 
 
 	##### TESTING FLAKES BELOW
