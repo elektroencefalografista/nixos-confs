@@ -16,7 +16,7 @@ in
 	
 	imports = [
 		./hardware-configuration.nix
-		(builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
+		./common.nix
 	];
 
 	boot = {
