@@ -12,7 +12,7 @@ in
 	time.timeZone = "Europe/Warsaw";
 	programs.bash.shellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";
 	security.sudo = {
-		enabled = true;
+		enable = true;
 		wheelNeedsPassword = false; # appearently thats outdated
 	};
 
