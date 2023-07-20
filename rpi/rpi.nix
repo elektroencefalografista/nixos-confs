@@ -3,6 +3,8 @@
 # TODO gonna need rclone downloader. wont work on first boot when docker isnt setup, but it will work eventually
 # TODO backing up prometheus database somehow
 
+#### DEPRECATED ####
+
 
 { config, pkgs, ... }:
 
