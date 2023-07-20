@@ -49,6 +49,7 @@ in
 		};
 		extraConfig = ''
 			AllowUsers ${username}@192.168.1.*
+			AllowUsers ${username}@172.*
 			AllowUsers ${username}@100.*
 		'';
 	};
