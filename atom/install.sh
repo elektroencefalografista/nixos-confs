@@ -1,18 +1,10 @@
 DISK="/dev/sda"
 ESP_SIZE="512MB"
-HOST="root@172.26.46.236"
+HOST="root@192.168.1.159"
 
 
 scp -o StrictHostKeychecking=no configuration.nix ${HOST}:/tmp/configuration.nix
-ssh -o StrictHostKeychecking=no ${HOST} 'bash -s' <<EOF
-	if [[ $(systemd-detect-virt) == "none" ]]; then
-		echo "running on hardware"
-		if [[ -b "/dev/disk/by-path/pci-0000:0a:00.2-ata-4" ]]; then
-			echo "ssd found"
-		fi
-	
-	fi
-	
+ssh -o StrictHostKeychecking=no ${HOST} 'bash -s' <<EOF	
 	if [[ ! -z ${DISK} ]]; then
 		echo "Partitioning"
 		parted -s ${DISK} -- mklabel gpt
