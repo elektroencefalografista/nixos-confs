@@ -18,4 +18,5 @@ if ( $args[0] -eq "test" ) {
 	scp server/conf2.nix ${target}:~/.tmp
 }
 
-ssh ${target} 'sudo mv ~/.tmp /etc/nixos/configuration.nix && sudo nixos-rebuild switch'
+scp common.nix ${target}:~/.tmp2
+ssh ${target} 'sudo mv ~/.tmp /etc/nixos/configuration.nix && sudo mv ~/.tmp2 /etc/nixos/common.nix && sudo nixos-rebuild switch'
