@@ -10,9 +10,11 @@ in
 {
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
 	time.timeZone = "Europe/Warsaw";
-	programs.bash.interactiveShellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";
-	security.sudo.enable =  true;
-	security.sudo.wheelNeedsPassword = false; # appearently thats outdated
+	programs.bash.shellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";
+	security.sudo = {
+		enabled = true;
+		wheelNeedsPassword = false; # appearently thats outdated
+	};
 
 	users.users."${username}" = {
 		isNormalUser = true;
