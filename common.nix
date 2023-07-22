@@ -1,5 +1,5 @@
 # common config options that genereally dont change often
-# TODO move out more stuff?
+# TODO move out more stuff? add some packages i know ill always use like htop or neofetch?
 
 let 
 	username = "drath";
@@ -9,6 +9,7 @@ in
 { config, pkgs,  ... }:
 
 {
+	boot.tmp.cleanOnBoot = true;
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
 	time.timeZone = "Europe/Warsaw";
 	programs.bash.shellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";

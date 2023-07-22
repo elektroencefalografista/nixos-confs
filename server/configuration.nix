@@ -27,7 +27,6 @@ in
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
 		kernelModules = [ "zenpower" "it87" ];
 		supportedFilesystems = [ "zfs" "btrfs" ];
-		tmp.cleanOnBoot = true;
 		zfs.extraPools = [ "zpool" ];
 
 		loader = {
