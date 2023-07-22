@@ -23,20 +23,51 @@ in
 	];
 
 	boot = {
+		blacklistedKernelModules = [ "k10temp" ];
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
+		kernelModules = [ "zenpower" "it87" ];
+		supportedFilesystems = [ "zfs" "btrfs" ];
+		tmp.cleanOnBoot = true;
+		zfs.extraPools = [ "zpool" ];
+
 		loader = {
 			systemd-boot.enable = true;
 			efi.canTouchEfiVariables = true;
 		};
-		blacklistedKernelModules = [ "k10temp" ];
-		kernelModules = [ "zenpower" "it87" ];
-		supportedFilesystems = [ "zfs" "btrfs" ];
+
 		kernelParams = [ 
 			"zfs.zfs_arc_min=0"
 			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}" 
 		];
-		tmp.cleanOnBoot = true;
 	};
+
+	environment = {
+		etc = {
+			"rclone/rclone.conf" = {
+				mode = "0644";
+				source = "/home/${cfg.username}/.config/rclone/rclone.conf";
+			};
+		};
+
+		systemPackages = with pkgs; [
+			vim
+			wget
+			htop
+			neofetch
+			mergerfs
+			nmap
+			lm_sensors
+		];
+		
+		variables = {
+			DOCKER_CONF_DIR = "$HOME/configs";
+			DOCKER_STORAGE_DIR = "/mnt/zpool/.docker-storage"; # maybe we should make it a nix variable for other services i port from docker
+			TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
+			EDITOR = "nano";
+			XZ_DEFAULTS = "-T0";
+		};
+	};
+
 
 	networking = {
 		hostName = cfg.hostname;
@@ -46,7 +77,6 @@ in
 		firewall.enable = false; # yea no. gotta figure out what ports i need
 	};
 
-	boot.zfs.extraPools = [ "zpool" ];
 
 	fileSystems = {
 		"/mnt/mfs_share" = {
@@ -98,38 +128,16 @@ in
 	};
 
 
-
-	########### USERS, ENV VARS and SSH KEYS ###########
-	
-	environment.variables = {
-		DOCKER_CONF_DIR = "$HOME/configs";
-		DOCKER_STORAGE_DIR = "/mnt/zpool/.docker-storage"; # maybe we should make it a nix variable for other services i port from docker
-		TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
-		EDITOR = "nano";
-		XZ_DEFAULTS = "-T0";
-	};
-
-
 	swapDevices = [ {
    		device = "/var/lib/swapfile";
     	size = cfg.mem.swapSize;
  	} ];
 
-	########### SOFTWARE and SERVICES ###########
+
 	virtualisation.docker = {
 		enable = true;
-		listenOptions = [ "/run/docker.sock" "0.0.0.0:2375"  ];
+		listenOptions = [ "/run/docker.sock" "192.168.1.200:2375"  ];
 	};
-	
-	environment.systemPackages = with pkgs; [
-		vim
-		wget
-		htop
-		neofetch
-		mergerfs
-		nmap
-		lm_sensors
-	];
 
 	services = {
 		getty.autologinUser = cfg.username;
@@ -192,49 +200,7 @@ in
 		};
 	};
 
-	####### USER SERVICES (basically only one-shots) #######
-	systemd.user = {
-		services = {
-			oneshot-config-downloader = {
-				enable = true;
-				path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
-				after = [ "rclone-config-downloader.service" ];
-				serviceConfig.Type = "oneshot";
-				unitConfig.ConditionPathExists = "!%S/%N.stamp";
-				serviceConfig.RemainAfterExit = "yes";
-				scriptArgs = "%S %N ${cfg.oneshotConfigDownloaderSource}";
-				script = ''
-					mkdir -p $1
-					rclone cat google:backup/$3/$3-docker-compose.tar.gz | pigz -d | tar -x -C ~ && \
-					rclone cat google:backup/$3/$3-home-dir.tar.gz | pigz -d | tar -x -C ~ && \
-					rclone cat google:backup/$3/$3-configs.tar.gz | pigz -d | tar -x -C ~ && \
-					touch $1/$2.stamp
-				'';
-				description = "Download homedir files from google drive";
-				wantedBy = [ "default.target" ];
-			};
-
-			rclone-config-downloader = {
-				enable = true;
-				path = [ pkgs.curl pkgs.gzip ];
-				serviceConfig.Type = "oneshot";
-				unitConfig.ConditionPathExists = "!%S/rclone/rclone.conf";
-				serviceConfig.RemainAfterExit = "yes";
-				scriptArgs = "%S";
-				script = ''
-					mkdir -p $1/rclone
-					curl -sSL 192.168.1.1:82/?q=rclone.conf | base64 -d | gzip -d > $1/rclone/rclone.conf
-				'';
-				description = "Download rclone config";
-				wantedBy = [ "default.target" ]; # this is what actually makes it run on boot
-			};
-		};
-	};
 	
-	####### SYSTEM SERVICES (backups) ######
-	# backups could be a user service, but that needs lingering and thats not supported on nixos yet
-	# for 7 years
-	# would be neater if this was a template service
 	systemd = {
 		services = {
 			telegraf = { # hack to make smartctl work
@@ -270,6 +236,44 @@ in
 				timerConfig = {
 					OnCalendar = "*-*-* 0,6,12,18:00:00";
 					Unit = "backup-configs.service";
+				};
+			};
+		};
+
+		user = {
+			services = {
+				oneshot-config-downloader = {
+					enable = true;
+					path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
+					after = [ "rclone-config-downloader.service" ];
+					serviceConfig.Type = "oneshot";
+					unitConfig.ConditionPathExists = "!%S/%N.stamp";
+					serviceConfig.RemainAfterExit = "yes";
+					scriptArgs = "%S %N ${cfg.oneshotConfigDownloaderSource}";
+					script = ''
+						mkdir -p $1
+						rclone cat google:backup/$3/$3-docker-compose.tar.gz | pigz -d | tar -x -C ~ && \
+						rclone cat google:backup/$3/$3-home-dir.tar.gz | pigz -d | tar -x -C ~ && \
+						rclone cat google:backup/$3/$3-configs.tar.gz | pigz -d | tar -x -C ~ && \
+						touch $1/$2.stamp
+					'';
+					description = "Download homedir files from google drive";
+					wantedBy = [ "default.target" ];
+				};
+
+				rclone-config-downloader = {
+					enable = true;
+					path = [ pkgs.curl pkgs.gzip ];
+					serviceConfig.Type = "oneshot";
+					unitConfig.ConditionPathExists = "!%S/rclone/rclone.conf";
+					serviceConfig.RemainAfterExit = "yes";
+					scriptArgs = "%S";
+					script = ''
+						mkdir -p $1/rclone
+						curl -sSL 192.168.1.1:82/?q=rclone.conf | base64 -d | gzip -d > $1/rclone/rclone.conf
+					'';
+					description = "Download rclone config";
+					wantedBy = [ "default.target" ]; # this is what actually makes it run on boot
 				};
 			};
 		};
