@@ -1,10 +1,6 @@
 # TODO all nitpicks:
 #	- autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
 # 	- bash prompt?
-#	- maybe we dont want to pull common.nix from the network? kind of a pain in the ass
-
-# go through the config in general and see if i can remove some shit
-# FIXME look through again to remove any placeholders and replace with actual values for the actual deployment on the actual server
 
 { config, pkgs, ... }:
 
@@ -24,7 +20,6 @@ in
 		./hardware-configuration.nix
 		./common.nix
 		(fetchTarball "https://github.com/nix-community/nixos-vscode-server/tarball/master")
-		# (builtins.fetchurl { url="https://raw.githubusercontent.com/elektroencefalografista/nixos-confs/main/common.nix"; })
 	];
 
 	boot = {
