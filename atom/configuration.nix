@@ -20,6 +20,7 @@ in
 	];
 
 	boot = {
+		tmp.cleanOnBoot = true;
 		loader = {
 			systemd-boot.enable = true;
 			efi.canTouchEfiVariables = true;
@@ -92,7 +93,8 @@ in
 					type = "prometheus";
 					url = "http://localhost:9090";
 				}];
-				# dashboards.path = "/path"; # maybe we could have a default, read-only dashboard? TODO?
+				# dashboards.path = "/path"; # maybe we could have a default, read-only dashboard? TODO? 
+				# maybe download dashboard from git/grafana, place it in some dir, point this option to the dir
 			};
 			settings = {
 				server = {
@@ -159,6 +161,6 @@ in
 	};
 
 	virtualisation.docker.enable = true;
-	powerManagement.cpuFreqGovernor = "ondemand";
+	powerManagement.cpuFreqGovernor = "conservative";
 	system.stateVersion = "23.05";
 }
