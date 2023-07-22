@@ -281,8 +281,4 @@ in
 
 	system.stateVersion = "23.05";
 	powerManagement.cpuFreqGovernor = "conservative";
-
-
-	##### TESTING FLAKES BELOW
-	nix.settings.experimental-features = [ "nix-command" "flakes" ];
 }
