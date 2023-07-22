@@ -1,4 +1,5 @@
 # common config options that genereally dont change often
+# TODO move out more stuff?
 
 let 
 	username = "drath";
