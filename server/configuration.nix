@@ -55,6 +55,7 @@ in
 			neofetch
 			mergerfs
 			nmap
+			gnumake
 			lm_sensors
 		];
 		
