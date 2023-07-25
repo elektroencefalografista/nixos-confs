@@ -54,6 +54,8 @@ in
 			htop
 			neofetch
 			mergerfs
+			curl
+			git
 			nmap
 			gnumake
 			lm_sensors
@@ -280,5 +282,5 @@ in
 	};
 
 	system.stateVersion = "23.05";
-	powerManagement.cpuFreqGovernor = "conservative";
+	powerManagement.cpuFreqGovernor = "shedutil";
 }
