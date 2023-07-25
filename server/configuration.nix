@@ -282,5 +282,5 @@ in
 	};
 
 	system.stateVersion = "23.05";
-	powerManagement.cpuFreqGovernor = "shedutil";
+	powerManagement.cpuFreqGovernor = "conservative";
 }
