@@ -12,7 +12,7 @@ in
 	boot.tmp.cleanOnBoot = true;
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
 	time.timeZone = "Europe/Warsaw";
-	programs.bash.shellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi";
+	programs.bash.shellInit = "if [[ -d $HOME/.bashrc.d ]]; then source $HOME/.bashrc.d/*; fi\nHISTCONTROL=ignoredups:erasedups";
 	security.sudo = {
 		enable = true;
 		wheelNeedsPassword = false; # appearently thats outdated
