@@ -74,9 +74,10 @@ in
 				"29bb852d-8363-4728-8acc-14fe66f5b8d8" = {
 					credentialsFile = "/etc/cloudflared_tunnel.json";
 					default = "http_status:404";
+					originRequest.noTLSVerify = true;
 					ingress = {
 						"grafana.drath.cc" = "http://localhost:3000";
-						# "portainer.drath.cc" = "http://localhost:9433"; # idk about making this one public
+						"portainer.drath.cc" = "https://localhost:9433"; # idk about making this one public
 						"precious.drath.cc" = "http://localhost:1111";
 					};
 				};
