@@ -4,12 +4,12 @@ if ( $args[0] -eq  "rpi" ) {
 }
 
 if ( $args[0] -eq "server" ) {
-	$target = "drath@server.lan"
+	$target = "drath@server"
 	scp server/configuration.nix ${target}:~/.tmp
 }
 
 if ( $args[0] -eq "atom" ) {
-	$target = "drath@192.168.1.1"
+	$target = "drath@atom"
 	scp atom/configuration.nix ${target}:~/.tmp
 }
 
