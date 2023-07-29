@@ -55,6 +55,8 @@ in
 			neofetch
 			mergerfs
 			curl
+			pciutils
+			lshw
 			git
 			nmap
 			gnumake
