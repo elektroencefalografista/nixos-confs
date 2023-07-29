@@ -140,7 +140,7 @@ in
 
 	virtualisation.docker = {
 		enable = true;
-		listenOptions = [ "/run/docker.sock" "192.168.1.200:2375"  ];
+		listenOptions = [ "/run/docker.sock" "0.0.0.0:2375"  ];
 	};
 
 	services = {
