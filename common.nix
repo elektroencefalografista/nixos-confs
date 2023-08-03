@@ -71,4 +71,8 @@ in
 			upper = "05:00";
 		};
 	};
+
+	# fixes a systemd bug, nixos-rebuild fails on nm-wait-online
+	systemd.services.NetworkManager-wait-online.enable = pkgs.lib.mkForce false;
+	systemd.services.systemd-networkd-wait-online.enable = pkgs.lib.mkForce false;
 }
