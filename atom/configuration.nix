@@ -152,7 +152,7 @@ in
 				};
 				description = "Backup prometheus database to the server";
 				script = ''
-					tar -C /var/lib -cf - prometheus2 | xz -5 -T2 | smbclient //server.lan/promdb -c "put - prometheus-db_$(date '+%Y-%m-%d').tar.xz" -U promdb%promdb
+					tar -C /var/lib -cf - prometheus2 | smbclient //server.lan/promdb -c "put - prometheus-db_$(date '+%Y-%m-%d').tar" -U promdb%promdb
 				'';
 			};
 		};
