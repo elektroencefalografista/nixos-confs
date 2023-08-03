@@ -10,7 +10,7 @@ let
 		username = "drath";
 		linuxVer = "linux_6_1"; # needed for extra kernel modules
 		zfs.arcSize = 4096;
-		mem.swapSize = 4096;
+		mem.swapSize = 8196;
 		oneshotConfigDownloaderSource = "server";
 	};
 in
@@ -32,6 +32,10 @@ in
 		loader = {
 			systemd-boot.enable = true;
 			efi.canTouchEfiVariables = true;
+		};
+
+		kernel.sysctl = {
+			"vm.swappiness" = 85;
 		};
 
 		kernelParams = [ 
@@ -198,6 +202,7 @@ in
 
 				outputs.prometheus_client = {
 					listen = ":9273";
+					ip_range = [ "192.168.1.0/24" ];
 					metric_version = 2;
 				};
 			};
