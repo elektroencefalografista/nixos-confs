@@ -61,7 +61,6 @@ in
 			htop
 			neofetch
 			lm_sensors
-			rsync
 		];
 	};
 
@@ -144,6 +143,18 @@ in
 					cd /home/${cfg.username}; tar -cvf - --exclude=runme.sh *.sh *.yml .bashrc.d mc | pigz | rclone --config=/etc/rclone/rclone.conf rcat google:backup/$HOSTNAME/$HOSTNAME-home-dir.tar.gz
 				'';
 			};
+
+			backup-prometheus-db = {
+				enable = true;
+				path = with pkgs; [ xz gnutar samba ];
+				serviceConfig = {
+					Type = "oneshot";
+				};
+				description = "Backup prometheus database to the server";
+				script = ''
+					tar -C /var/lib -cf - prometheus2 | xz -5 -T2 | smbclient //server.lan/promdb -c "put - prometheus-db_$(date '+%Y-%m-%d').tar.xz" -U promdb%promdb
+				'';
+			};
 		};
 
 		timers = {
@@ -155,6 +166,17 @@ in
 				timerConfig = {
 					OnCalendar = "*-*-* 0,6,12,18:00:00";
 					Unit = "backup-configs.service";
+				};
+			};
+
+			backup-prometheus-db  = {
+				enable = true;
+				wantedBy = [ "timers.target" ];
+				description = "Timer to backup prometheus database to the server";
+				requires = [ "backup-prometheus-db.service" ];
+				timerConfig = {
+					OnCalendar = "daily";
+					Unit = "backup-prometheus-db.service";
 				};
 			};
 		};
