@@ -35,7 +35,7 @@ in
 		};
 
 		kernel.sysctl = {
-			"vm.swappiness" = 85;
+			"vm.swappiness" = 15;
 		};
 
 		kernelParams = [ 
