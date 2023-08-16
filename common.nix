@@ -64,7 +64,7 @@ in
 
 	system.autoUpgrade = {
 		enable = true;
-		allowReboot = true;
+		# allowReboot = true;
 		channel = "https://channels.nixos.org/nixos-23.05";
 		rebootWindow = {
 			lower = "01:00";
