@@ -1,6 +1,5 @@
 # common config options that genereally dont change often
-# TODO move out more stuff? add some packages i know ill always use like htop or neofetch?
-# figure out how to import vars from this
+# TODO figure out how to import vars from this
 
 let 
 	cfg = {
