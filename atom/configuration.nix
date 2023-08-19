@@ -1,6 +1,5 @@
 # TODO figure out how to backup/provision basic settings for pihole?
 # TODO http with flask instead of docker
-# TODO backing up prometheus database somehow
 
 { config, pkgs, ... }:
 
@@ -9,6 +8,9 @@ let
 		hostname = "atom";
 		username = "drath";
 		mem.swapSize = 256;
+		backup = {
+			backend = "b2:drath-backup";
+		};
 	};
 in
 
@@ -130,45 +132,20 @@ in
 
 	systemd = {
 		services = {
-			backup-configs = {
-				enable = true;
-				path = with pkgs; [ pigz gnutar rclone ];
-				serviceConfig = {
-					Type = "oneshot";
-				};
-				description = "Backup scripts and configs to google drive";
-				script = ''
-					cd /home/${cfg.username}; tar -cvf - configs | pigz | rclone --config=/etc/rclone/rclone.conf rcat google:backup/$HOSTNAME/$HOSTNAME-configs.tar.gz
-					cd /home/${cfg.username}; tar -cvf - docker-compose | pigz | rclone --config=/etc/rclone/rclone.conf rcat google:backup/$HOSTNAME/$HOSTNAME-docker-compose.tar.gz
-					cd /home/${cfg.username}; tar -cvf - --exclude=runme.sh *.sh *.yml .bashrc.d mc | pigz | rclone --config=/etc/rclone/rclone.conf rcat google:backup/$HOSTNAME/$HOSTNAME-home-dir.tar.gz
-				'';
-			};
-
 			backup-prometheus-db = {
 				enable = true;
-				path = with pkgs; [ xz gnutar samba ];
+				path = with pkgs; [ gnutar rclone pigz ];
 				serviceConfig = {
 					Type = "oneshot";
 				};
 				description = "Backup prometheus database to the server";
 				script = ''
-					tar -C /var/lib -cf - prometheus2 | smbclient //server.lan/promdb -c "put - prometheus-db_$(date '+%Y-%m-%d').tar" -U promdb%promdb
+					tar -C /var/lib -cf - prometheus2 | pigz | rclone --config=/etc/rclone/rclone.conf rcat ${cfg.backup.backend}/$HOSTNAME/prometheus_db.tar.gz
 				'';
 			};
 		};
 
 		timers = {
-			backup-configs = {
-				enable = true;
-				wantedBy = [ "timers.target" ];
-				description = "Timer to backup scripts and configs to google drive";
-				requires = [ "backup-configs.service" ];
-				timerConfig = {
-					OnCalendar = "*-*-* 0,6,12,18:00:00";
-					Unit = "backup-configs.service";
-				};
-			};
-
 			backup-prometheus-db  = {
 				enable = true;
 				wantedBy = [ "timers.target" ];

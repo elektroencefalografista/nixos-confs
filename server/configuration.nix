@@ -221,35 +221,8 @@ in
 					Group = pkgs.lib.mkForce "root";
 				};
 			};
-
-			backup-configs = {
-				enable = true;
-				path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
-				serviceConfig = {
-					Type = "oneshot";
-					User = cfg.username;
-				};
-				description = "Backup scripts and configs to google drive";
-				script = ''
-					cd ~; tar -cvf - configs | pigz | rclone rcat google:backup/$HOSTNAME/$HOSTNAME-configs.tar.gz
-					cd ~; tar -cvf - docker-compose | pigz | rclone rcat google:backup/$HOSTNAME/$HOSTNAME-docker-compose.tar.gz
-					cd ~; tar -cvf - --exclude=runme.sh *.sh *.yml .bashrc.d mc | pigz | rclone rcat google:backup/$HOSTNAME/$HOSTNAME-home-dir.tar.gz
-				'';
-			};
 		};
 
-		timers = {
-			backup-configs = {
-				enable = true;
-				wantedBy = [ "timers.target" ];
-				description = "Timer to backup scripts and configs to google drive";
-				requires = [ "backup-configs.service" ]; # fuck you
-				timerConfig = {
-					OnCalendar = "*-*-* 0,6,12,18:00:00";
-					Unit = "backup-configs.service";
-				};
-			};
-		};
 
 		user = {
 			services = {
