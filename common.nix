@@ -102,7 +102,7 @@ in
 		};
 		timers = {
 			backup-configs = {
-				enable = true;
+				enable = pkgs.lib.mkDefault true;
 				wantedBy = [ "timers.target" ];
 				description = "Timer to home dir and container configuration to cloud storage";
 				requires = [ "backup-configs.service" ]; # fuck you
