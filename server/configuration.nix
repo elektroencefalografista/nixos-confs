@@ -55,8 +55,6 @@ in
 		systemPackages = with pkgs; [
 			vim
 			wget
-			htop
-			neofetch
 			ffmpeg
 			mergerfs
 			curl

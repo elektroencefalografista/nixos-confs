@@ -39,6 +39,13 @@ in
 		];
 	};
 
+	environment = {
+		systemPackages = with pkgs; [
+			htop
+			neofetch
+		];
+	};
+
 
 	nix = {
 		settings = {

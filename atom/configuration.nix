@@ -60,8 +60,6 @@ in
 		};
 
 		systemPackages = with pkgs; [
-			htop
-			neofetch
 			lm_sensors
 		];
 	};
