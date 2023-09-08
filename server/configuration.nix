@@ -193,7 +193,7 @@ in
 						ignore_fs = [ "tmpfs" "devtmpfs" "devfs" "iso9660" "overlay" "aufs" "squashfs" ];
 					};
 					diskio = {
-						device_tags = [ "ID_MODEL" "ID_SERIAL_SHORT" "ID_PATH" ];
+						device_tags = [ "ID_MODEL" "ID_SERIAL_SHORT" "ID_PATH" "ID_ATA_ROTATION_RATE_RPM" ];
 					};
 					zfs = {
 						poolMetrics = true;
