@@ -60,6 +60,7 @@ in
 			curl
 			pciutils
 			screen
+			zip
 			lshw
 			git
 			nmap
