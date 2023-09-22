@@ -157,7 +157,7 @@ in
 
 		nfs = {
 			server = {
-				enable = true;
+				enable = true; # fucky with samba?
 				exports = ''
 					/mnt 192.168.1.0/24(ro,fsid=0,no_subtree_check) 100.0.0.0/8(ro,fsid=0,no_subtree_check)
 					/mnt/anime 192.168.1.0/24(rw,fsid=1,sync,no_subtree_check,crossmnt) 100.0.0.0/8(rw,fsid=1,sync,no_subtree_check,crossmnt)
@@ -167,6 +167,45 @@ in
 				[nfsd]
 				vers3=n
 			'';
+		};
+
+
+		samba-wsdd.enable = true;
+		samba = {
+			enable = true;
+			openFirewall = true;
+			securityType = "user";
+			extraConfig = ''
+				server min protocol = SMB3
+				workgroup = WORKGROUP
+				server string = server
+    			netbios name = server
+    			security = user 
+    			use sendfile = yes
+    			hosts allow = 192.168.1. 100. 127.0.0.1 localhost
+    			hosts deny = 0.0.0.0/0
+    			guest account = nobody
+    			map to guest = bad user
+			'';
+			shares = {
+				anime = {
+					path = "/mnt/anime";
+					"valid users" = "drath";
+					"guest ok" = "no";
+					"read only" = "no";
+					browseable = "yes";
+					"create mask" = "0644";
+   				    "directory mask" = "0755";
+      				"force user" = "drath";
+      				# "force group" = "drath";
+				};
+				movies = {
+					path = "/mnt/anime/Jellyfin";
+					"guest ok" = "yes";
+					"read only" = "yes";
+					browseable = "yes";
+				};
+			};
 		};
 
 		telegraf = {
