@@ -10,7 +10,7 @@ let
 		username = "drath";
 		linuxVer = "linux_6_1"; # needed for extra kernel modules
 		zfs.arcSize = 6144;
-		mem.swapSize = 8196;
+		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
 	};
 in
@@ -35,7 +35,7 @@ in
 		};
 
 		kernel.sysctl = {
-			"vm.swappiness" = 10;
+			"vm.swappiness" = 5;
 		};
 
 		kernelParams = [ 
