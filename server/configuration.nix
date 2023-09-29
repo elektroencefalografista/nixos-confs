@@ -157,7 +157,7 @@ in
 
 		nfs = {
 			server = {
-				enable = true; # fucky with samba?
+				enable = true;
 				exports = ''
 					/mnt 192.168.1.0/24(ro,fsid=0,no_subtree_check) 100.0.0.0/8(ro,fsid=0,no_subtree_check)
 					/mnt/anime 192.168.1.0/24(rw,fsid=1,sync,no_subtree_check,crossmnt) 100.0.0.0/8(rw,fsid=1,sync,no_subtree_check,crossmnt)
