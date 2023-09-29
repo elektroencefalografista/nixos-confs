@@ -9,7 +9,7 @@ let
 		hostname = "server";
 		username = "drath";
 		linuxVer = "linux_6_1"; # needed for extra kernel modules
-		zfs.arcSize = 4096;
+		zfs.arcSize = 6144;
 		mem.swapSize = 8196;
 		oneshotConfigDownloaderSource = "server";
 	};
