@@ -264,5 +264,6 @@ in
 	};
 
 	system.stateVersion = "23.05";
+	system.autoUpgrade.allowReboot = true; # gonna risk it
 	powerManagement.cpuFreqGovernor = "conservative";
 }

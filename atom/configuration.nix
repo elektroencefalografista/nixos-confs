@@ -158,6 +158,7 @@ in
 	};
 
 	virtualisation.docker.enable = true;
+	system.autoUpgrade.allowReboot = true; # gonna risk it
 	powerManagement.cpuFreqGovernor = "conservative";
 	system.stateVersion = "23.05";
 }
