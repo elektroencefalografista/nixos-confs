@@ -37,7 +37,8 @@ in
 		defaultGateway = "192.168.1.254";
 		nameservers = [ "127.0.0.1" ];
 		hostName = cfg.hostname;
-		firewall.allowedTCPPorts = [ 53 67 80 82 9090 9443 ]; # port 81 still works?
+		firewall.enable = false;
+		firewall.allowedTCPPorts = [ 53 67 80 82 8123 6053 9090 9443 ]; # port 81 still works?
 		firewall.allowedUDPPorts = [ 53 67 547 ];
 	};
 
