@@ -59,8 +59,6 @@ in
 		];
 	};
 
-	services.tailscale.enable = true; # TODO remove eventually?
-
 	systemd = {
 		services = {
 			backup-prometheus-db = {
