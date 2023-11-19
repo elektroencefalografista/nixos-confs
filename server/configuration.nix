@@ -24,7 +24,7 @@ in
 
 	boot = {
 		blacklistedKernelModules = [ "k10temp" ];
-		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
+		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower ];
 		kernelModules = [ "zenpower" ];
 		supportedFilesystems = [ "zfs" "btrfs" ];
 		zfs.extraPools = [ "zpool" ];
