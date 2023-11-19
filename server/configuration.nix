@@ -40,7 +40,7 @@ in
 
 		kernelParams = [ 
 			"zfs.zfs_arc_min=0"
-			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}" 
+			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}"
 		];
 	};
 
@@ -84,6 +84,12 @@ in
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
 		firewall.enable = false; # yea no. gotta figure out what ports i need
+		interfaces.enp6s0.ipv4.addresses = [{ # breaks on different hardware ugh. predictable names? 
+			address = "192.168.1.200";
+			prefixLength = 24;
+		}];
+		defaultGateway = "192.168.1.254";
+		nameservers = [ "192.168.1.1" ];
 	};
 
 
