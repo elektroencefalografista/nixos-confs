@@ -41,6 +41,8 @@ in
 		kernelParams = [ 
 			"zfs.zfs_arc_min=0"
 			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}"
+			"initcall_blacklist=acpi_cpufreq_init"
+			"amd_pstate=passive"
 		];
 	};
 
