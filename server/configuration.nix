@@ -56,7 +56,8 @@ in
 		};
 
 		systemPackages = with pkgs; [
-						vim
+			vim
+			restic
 			wget
 			ffmpeg
 			mergerfs
