@@ -12,6 +12,10 @@ let
 		hostname = "server";
 		username = "drath";
 		linuxVer = "linux_6_1"; # needed for extra kernel modules
+		docker = {
+			confDir = "$HOME/configs";
+			storageDir = "/mnt/zpool/.docker-storage";
+		};
 		zfs.arcSize = 6144;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
@@ -76,15 +80,15 @@ in
 		];
 		
 		variables = {
-			DOCKER_CONF_DIR = "$HOME/configs";
-			DOCKER_STORAGE_DIR = "/mnt/zpool/.docker-storage"; # maybe we should make it a nix variable for other services i port from docker
+			DOCKER_CONF_DIR = cfg.docker.confDir;
+			DOCKER_STORAGE_DIR = cfg.docker.storageDir; # maybe we should make it a nix variable for other services i port from docker
 			TZ = "$(ls -l /etc/localtime | rev | cut -d \"/\" -f1-2 | rev)";
 			EDITOR = "nano";
 			XZ_DEFAULTS = "-T0";
 		};
 
 		shellAliases = {
-			yt = "docker run -i -e PGID=1000 -e PUID=1000 -v /mnt/anime/yt-dl:/downloads -v /mnt/zpool/.docker-storage/cookies.txt:/cookies.txt -u 1000:1000 jauderho/yt-dlp --cookies /cookies.txt";
+			yt = "docker run -i -e PGID=1000 -e PUID=1000 -v /mnt/anime/yt-dl:/downloads -v ${cfg.docker.storageDir}/cookies.txt:/cookies.txt -u 1000:1000 jauderho/yt-dlp --cookies /cookies.txt";
 			mk_filelist = "sudo find /mnt/anime -name '*' | sort | gzip -9 > filelist.txt.gz";
 		};
 
