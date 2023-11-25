@@ -238,6 +238,7 @@ in
 			};
 		};
 
+		# probably should move to common
 		restic.backups = {
 			confs = {
 				passwordFile = "/etc/restic/restic-pw";
@@ -248,7 +249,6 @@ in
 					"/home/${cfg.username}/build"
 					"/home/${cfg.username}/scripts"
 					"/home/${cfg.username}/mc"
-					"/home/${cfg.username}/cum"
 					"/home/${cfg.username}/docker-compose.yml"
 				];
 				pruneOpts = [
@@ -268,7 +268,8 @@ in
 	
 	systemd = {
 		services = {
-			telegraf = { # hack to make smartctl work
+			# hack to make smartctl work
+			telegraf = {
 				path = [ pkgs.lm_sensors pkgs.smartmontools pkgs.nvme-cli ];
 				serviceConfig = {
 					User = pkgs.lib.mkForce "root";
