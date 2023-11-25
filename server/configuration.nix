@@ -12,6 +12,7 @@ let
 		zfs.arcSize = 6144;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
+		net.interface_name = "enp6s0"; # breaks on different hardware ugh. predictable names? maybe just dhcp after all
 	};
 in
 
@@ -55,7 +56,7 @@ in
 		};
 
 		systemPackages = with pkgs; [
-			vim
+						vim
 			wget
 			ffmpeg
 			mergerfs
@@ -86,7 +87,7 @@ in
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
 		firewall.enable = false; # yea no. gotta figure out what ports i need
-		interfaces.enp6s0.ipv4.addresses = [{ # breaks on different hardware ugh. predictable names? 
+		interfaces.${cfg.net.interface_name}.ipv4.addresses = [{ 
 			address = "192.168.1.200";
 			prefixLength = 24;
 		}];
