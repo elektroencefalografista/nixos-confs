@@ -1,0 +1,109 @@
+alias ll="ls -al"
+alias lh="ls -alh"
+alias mk_filelist="sudo find /mnt/anime -name '*' | sort | gzip -9 > filelist.txt.gz"
+
+alias ig="vi ${DOCKER_CONF_DIR}/instaloader/ig_users.txt && sort -o ${DOCKER_CONF_DIR}/instaloader/ig_users.txt ${DOCKER_CONF_DIR}/instaloader/ig_users.txt"
+alias twt="vi ${DOCKER_CONF_DIR}/twitloader/twt_users.txt && sort -o ${DOCKER_CONF_DIR}/twitloader/twt_users.txt ${DOCKER_CONF_DIR}/twitloader/twt_users.txt"
+alias vialias='vi $HOME/.bashrc.d/alias && source $HOME/.bashrc.d/alias'
+
+alias neofetch="curl -SsL https://raw.githubusercontent.com/dylanaraps/neofetch/master/neofetch | bash"
+alias screenfetch="curl -SsL https://raw.githubusercontent.com/KittyKatt/screenFetch/master/screenfetch-dev | bash"
+
+alias ctop='docker run --name ctop -it --rm -v /var/run/docker.sock:/var/run/docker.sock quay.io/vektorlab/ctop'
+
+#alias yt-dl="docker run \
+#	--rm -i \
+#	-e PGID=1000 \
+#	-e PUID=1000 \
+#	-v /mnt/anime/yt-dl:/data:rw \
+#    	-u 1000:1000 \
+#	w33ble/youtube-dl"
+
+alias yt="docker run \
+	-i \
+	-e PGID=1000 \
+	-e PUID=1000 \
+	-v /mnt/anime/yt-dl:/downloads:rw \
+        -v /mnt/zpool/.docker-storage/cookies.txt:/cookies.txt:rw \
+	-u 1000:1000 \
+	jauderho/yt-dlp \
+        --cookies /cookies.txt"
+	
+
+alias instaloader_user="docker run --rm -i \
+    -e PGID=1000 -e PUID=1000 \
+    -v /mnt/share/instaloader:/download:rw \
+    -v ${DOCKER_CONF_DIR}/instaloader/il_args.txt:/il_args.txt:rw \
+    -v ${DOCKER_CONF_DIR}/instaloader/ig_users.txt:/il_targets.txt:rw \
+    -v ${DOCKER_CONF_DIR}/instaloader/session-drathvader000:/session:rw \
+    -u 1000:1000 \
+    instaloader"
+
+alias instaloader="docker run --rm -i \
+    -e PGID=1000 -e PUID=1000 \
+    -v /mnt/anime/instaloader:/download:rw \
+    -v ${DOCKER_CONF_DIR}/instaloader/il_anon.txt:/il_args.txt:rw \
+    -v ${DOCKER_CONF_DIR}/instaloader/ig_users.txt:/il_targets.txt:rw \
+    -u 1000:1000 \
+    didc/docker-instaloader"
+    
+alias twitloader="docker run --rm -i \
+    -v /mnt/anime/twitloader:/app/rips:rw \
+    -v ${DOCKER_CONF_DIR}/twitloader:/conf \
+    -u 1000:1000 \
+    ripme \
+    -f /conf/twt_users.txt"
+
+function dc() {
+	NAME="$1"
+	shift
+	if [[ "${NAME}" == "-a" ]]; then
+		for FILE in *.yml; do
+			docker compose -f "${FILE}" -p $(basename "${FILE}" .yml) $@
+		done
+	else
+		docker compose -f ${NAME} -p $(basename ${NAME} .yml) $@
+	fi
+}
+ 
+function chomik() {
+	docker run -it --rm \
+	-v "/mnt/anime/!-Animy":/anime:ro \
+	-v "/mnt/share/upload":/upload \
+	chomikuj \
+	$@.py
+}
+
+function tree() {
+	if [[ -n "$1" ]]; then DEPTH=2; fi
+	pwd
+	find . -type d -maxdepth $1 -print 2> /dev/null | awk '!/\.$/ {for (i=1;i<NF-1;i++){printf("│   ")}print "├── "$NF}'  FS='/'
+}
+
+function duh() {
+	du $1 -d 1 -h | sort -hr | tail -n +2
+} 
+
+function upload() {
+	docker run -i --rm \
+   -v /etc/rclone:/config/rclone \
+   -v "$1":/src \
+   rclone/rclone:latest copy -v /src 'google:up/$(basename "$1")'
+}
+
+function ytwait() {
+	OUTPUT_DIR="/mnt/anime/streams/"
+	# ^ any directory you want the stream to be saved, ie. /home/user/streams
+	# $(pwd) is the directory where the script is
+
+	echo "Running, press Ctrl+C to stop"
+	while [[ true ]]; do
+	    docker run  --rm -i \
+	    -e PGID=1000 \
+	    -e PUID=1000 \
+	    -v ${OUTPUT_DIR}:/data:rw \
+	    -v $(pwd)/cookies.txt:/cookies.txt \
+	    w33ble/youtube-dl --cookies /cookies.txt $1 && break || continue 
+	    # ^ breaks the while loop if docker succeds, continues the loop if fails
+	done
+}
