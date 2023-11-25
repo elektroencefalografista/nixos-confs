@@ -297,11 +297,13 @@ in
 					"--keep-weekly 4"
 					"--keep-monthly 12"
 					"--keep-yearly 75"
+					"--tag configs"
 				];
 				timerConfig = {
 					OnCalendar = "*-*-* 0,6,12,18:00:00";
 					Persistent = "true";
 				};
+				extraBackupArgs = [ "--tag configs" ];
 			};
 		};
 	};
