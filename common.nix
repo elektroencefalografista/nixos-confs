@@ -1,5 +1,6 @@
 # common config options that genereally dont change often
 # TODO figure out how to import vars from this
+# TODO rewrite backup service with restic instead of rclone
 
 let 
 	cfg = {
