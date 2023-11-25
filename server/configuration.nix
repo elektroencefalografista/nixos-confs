@@ -293,8 +293,8 @@ in
 					"/home/${cfg.username}/docker-compose.yml"
 				];
 				pruneOpts = [
-					"--keep-daily 4"
-					"--keep-weekly 5"
+					"--keep-daily 7"
+					"--keep-weekly 4"
 					"--keep-monthly 12"
 					"--keep-yearly 75"
 				];
