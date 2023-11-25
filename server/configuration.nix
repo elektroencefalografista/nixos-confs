@@ -207,7 +207,6 @@ in
 				workgroup = WORKGROUP
 				server string = server
 				netbios name = server
-				security = user 
 				use sendfile = yes
 				hosts allow = 192.168.1. 100. 127.0.0.1 localhost
 				hosts deny = 0.0.0.0/0
@@ -220,7 +219,7 @@ in
 					"valid users" = "drath";
 					"guest ok" = "no";
 					"read only" = "no";
-					browseable = "yes";
+					"browseable" = "yes";
 					"create mask" = "0644";
    					"directory mask" = "0755";
 	  				"force user" = "drath";
@@ -230,7 +229,7 @@ in
 					path = "/mnt/anime/Jellyfin";
 					"guest ok" = "yes";
 					"read only" = "yes";
-					browseable = "yes";
+					"browseable" = "yes";
 				};
 			};
 		};
