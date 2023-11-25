@@ -3,7 +3,7 @@
 # - bash prompt?
 
 # REAL TODO
-# - config downloader with restic? do we need one?
+# - config downloader with restic? do we need one? could use autoloading restic config
 
 { config, pkgs, ... }:
 
