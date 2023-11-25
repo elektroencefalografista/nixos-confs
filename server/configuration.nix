@@ -208,7 +208,7 @@ in
 				server string = server
 				netbios name = server
 				use sendfile = yes
-				hosts allow = 192.168.1. 100. 127.0.0.1 localhost
+				hosts allow = 192.168.1. 100.
 				hosts deny = 0.0.0.0/0
 				guest account = nobody
 				map to guest = bad user
