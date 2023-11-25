@@ -1,6 +1,9 @@
 # TODO all nitpicks:
-#	- autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
+# - autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
 # - bash prompt?
+
+# REAL TODO
+# - config downloader with restic? do we need one?
 
 { config, pkgs, ... }:
 
@@ -79,6 +82,21 @@ in
 			EDITOR = "nano";
 			XZ_DEFAULTS = "-T0";
 		};
+
+		shellAliases = {
+			yt = "docker run -i -e PGID=1000 -e PUID=1000 -v /mnt/anime/yt-dl:/downloads -v /mnt/zpool/.docker-storage/cookies.txt:/cookies.txt -u 1000:1000 jauderho/yt-dlp --cookies /cookies.txt";
+			mk_filelist = "sudo find /mnt/anime -name '*' | sort | gzip -9 > filelist.txt.gz";
+		};
+
+		shellInit = ''
+			function chomik() {
+					docker run -it --rm \
+					-v "/mnt/anime/!-Animy":/anime:ro \
+					-v "/mnt/share/upload":/upload \
+					chomikuj \
+					$@.py
+			}
+		'';
 	};
 
 
@@ -219,6 +237,32 @@ in
 				};
 			};
 		};
+
+		restic.backups = {
+			confs = {
+				passwordFile = "/etc/restic/restic-pw";
+				repositoryFile = "/etc/restic/repository";
+				environmentFile = "/etc/restic/s3Credentials.env";
+				paths = [ 
+					"/home/${cfg.username}/configs"
+					"/home/${cfg.username}/build"
+					"/home/${cfg.username}/scripts"
+					"/home/${cfg.username}/mc"
+					"/home/${cfg.username}/cum"
+					"/home/${cfg.username}/docker-compose.yml"
+				];
+				pruneOpts = [
+					"--keep-daily 4"
+					"--keep-weekly 5"
+					"--keep-monthly 12"
+					"--keep-yearly 75"
+				];
+				timerConfig = {
+					OnCalendar = "*-*-* 0,6,12,18:00:00";
+					Persistent = "true";
+				};
+			};
+		};
 	};
 
 	
@@ -229,45 +273,6 @@ in
 				serviceConfig = {
 					User = pkgs.lib.mkForce "root";
 					Group = pkgs.lib.mkForce "root";
-				};
-			};
-		};
-
-
-		user = {
-			services = {
-				oneshot-config-downloader = {
-					enable = true;
-					path = [ pkgs.pigz pkgs.gnutar pkgs.rclone ];
-					after = [ "rclone-config-downloader.service" ];
-					serviceConfig.Type = "oneshot";
-					unitConfig.ConditionPathExists = "!%S/%N.stamp";
-					serviceConfig.RemainAfterExit = "yes";
-					scriptArgs = "%S %N ${cfg.oneshotConfigDownloaderSource}";
-					script = ''
-						mkdir -p $1
-						rclone cat google:backup/$3/$3-docker-compose.tar.gz | pigz -d | tar -x -C ~ && \
-						rclone cat google:backup/$3/$3-home-dir.tar.gz | pigz -d | tar -x -C ~ && \
-						rclone cat google:backup/$3/$3-configs.tar.gz | pigz -d | tar -x -C ~ && \
-						touch $1/$2.stamp
-					'';
-					description = "Download homedir files from google drive";
-					wantedBy = [ "default.target" ];
-				};
-
-				rclone-config-downloader = {
-					enable = true;
-					path = [ pkgs.curl pkgs.gzip ];
-					serviceConfig.Type = "oneshot";
-					unitConfig.ConditionPathExists = "!%S/rclone/rclone.conf";
-					serviceConfig.RemainAfterExit = "yes";
-					scriptArgs = "%S";
-					script = ''
-						mkdir -p $1/rclone
-						curl -sSL 192.168.1.1:82/?q=rclone.conf | base64 -d | gzip -d > $1/rclone/rclone.conf
-					'';
-					description = "Download rclone config";
-					wantedBy = [ "default.target" ]; # this is what actually makes it run on boot
 				};
 			};
 		};
