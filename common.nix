@@ -15,6 +15,10 @@ in
 { config, pkgs,  ... }:
 
 {
+	imports = [
+		./secrets.nix
+	];
+
 	boot.tmp.cleanOnBoot = true;
 	i18n.defaultLocale = "pl_PL.UTF-8"; # need to be set explicitly
 	time.timeZone = "Europe/Warsaw";
@@ -44,6 +48,29 @@ in
 			htop
 			neofetch
 		];
+
+		shellAliases = {
+			ll = "ls -al";
+			lh = "ls -alh";
+		};
+
+		shellInit = ''
+			function dc() {
+				NAME="$1"
+				shift
+				if [[ "''${NAME}" == "-a" ]]; then
+						for FILE in *.yml; do
+								docker compose -f "''${FILE}" -p $(basename "''${FILE}" .yml) $@
+						done
+				else
+						docker compose -f ''${NAME} -p $(basename ''${NAME} .yml) $@
+				fi
+			}
+
+			function duh() {
+					du $1 -d 1 -h | sort -hr | tail -n +2
+			}
+		'';
 	};
 
 
@@ -83,7 +110,7 @@ in
 			upper = "05:00";
 		};
 	};
-    
+	
 	systemd = {
 		services = {
 			backup-configs = {
