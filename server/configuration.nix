@@ -1,6 +1,6 @@
 # TODO all nitpicks:
 #	- autodetect kernel version for modules?, though nixos uses LTS kernel so its not a huge deal
-# 	- bash prompt?
+# - bash prompt?
 
 { config, pkgs, ... }:
 
