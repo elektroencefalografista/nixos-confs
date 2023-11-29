@@ -251,6 +251,7 @@ in
 					sensors = {};
 					system = {};
 					smart = {
+						interval = "1m";
 						attributes = true;
 					};
 					docker = {
