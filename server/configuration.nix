@@ -16,7 +16,7 @@ let
 			confDir = "$HOME/configs";
 			storageDir = "/mnt/zpool/.docker-storage";
 		};
-		zfs.arcSize = 6144;
+		zfs.arcSize = 8*1024;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
 		net.interface_name = "enp6s0"; # breaks on different hardware ugh. predictable names? maybe just dhcp after all
@@ -242,6 +242,9 @@ in
 		telegraf = {
 			enable = true;
 			extraConfig = {
+				global_tags = {
+					interval = "5s";
+				};
 				inputs = {
 					mem = {};
 					cpu = {};
@@ -257,16 +260,18 @@ in
   						total_include = [ "cpu" "blkio" "network" ];
 					};
 					net = {
-						interval = "5s";
+						# interval = "5s";
   						interfaces = [ "enp*s[0-9]" ];
 					};
 					disk = {
+						interval = "15s";
 						ignore_fs = [ "tmpfs" "devtmpfs" "devfs" "iso9660" "overlay" "aufs" "squashfs" ];
 					};
 					diskio = {
 						device_tags = [ "ID_MODEL" "ID_SERIAL_SHORT" "ID_PATH" "ID_ATA_ROTATION_RATE_RPM" ];
 					};
 					zfs = {
+						interval = "15s";
 						poolMetrics = true;
 					};
 				};
