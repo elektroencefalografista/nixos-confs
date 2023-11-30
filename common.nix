@@ -124,6 +124,7 @@ in
 				timerConfig = {
 					OnCalendar = "*-*-* 0,6,12,18:00:00";
 					Persistent = "true";
+					RandomizedDelaySec = 15 * 60;
 				};
 				extraBackupArgs = [ "--tag configs" ];
 			};
