@@ -182,7 +182,6 @@ in
 
 	services = {
 		getty.autologinUser = cfg.username;
-		timesyncd.enable = true;
 		tailscale.enable = true; # still need to join by hand but thats probably fine
 		vscode-server.enable = true;
 		zfs.autoScrub.enable = true;
@@ -254,6 +253,7 @@ in
 						interval = "1m";
 						attributes = true;
 					};
+					systemd_units = {};
 					docker = {
 						endpoint =  "unix:///run/docker.sock";
   						perdevice = false;
@@ -286,32 +286,6 @@ in
 		};
 
 		# probably should move to common
-		restic.backups = {
-			confs = {
-				passwordFile = "/etc/restic/restic-pw";
-				repositoryFile = "/etc/restic/repository";
-				environmentFile = "/etc/restic/s3Credentials.env";
-				paths = [ 
-					"/home/${cfg.username}/configs"
-					"/home/${cfg.username}/build"
-					"/home/${cfg.username}/scripts"
-					"/home/${cfg.username}/mc"
-					"/home/${cfg.username}/docker-compose.yml"
-				];
-				pruneOpts = [
-					"--keep-daily 7"
-					"--keep-weekly 4"
-					"--keep-monthly 12"
-					"--keep-yearly 75"
-					"--tag configs"
-				];
-				timerConfig = {
-					OnCalendar = "*-*-* 0,6,12,18:00:00";
-					Persistent = "true";
-				};
-				extraBackupArgs = [ "--tag configs" ];
-			};
-		};
 	};
 
 	

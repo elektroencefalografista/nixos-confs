@@ -89,16 +89,47 @@ in
 		'';
 	};
 
-	services.openssh = {
-		enable = true;
-		settings = {
-			PermitRootLogin = "no";
-			PasswordAuthentication = false;
+	services = {
+		openssh = {
+			enable = true;
+			settings = {
+				PermitRootLogin = "no";
+				PasswordAuthentication = false;
+			};
+			extraConfig = ''
+				AllowUsers ${cfg.username}@192.168.1.*
+				AllowUsers ${cfg.username}@100.*
+			'';
 		};
-		extraConfig = ''
-			AllowUsers ${cfg.username}@192.168.1.*
-			AllowUsers ${cfg.username}@100.*
-		'';
+
+		restic.backups = {
+			confs = {
+				passwordFile = "/etc/restic/restic-pw";
+				repositoryFile = "/etc/restic/repository";
+				environmentFile = "/etc/restic/s3Credentials.env";
+				paths = [ 
+					"/home/${cfg.username}/configs"
+					"/home/${cfg.username}/build"
+					"/home/${cfg.username}/scripts"
+					"/home/${cfg.username}/mc"
+					"/home/${cfg.username}/docker-compose.yml"
+				];
+				pruneOpts = [
+					"--keep-daily 7"
+					"--keep-weekly 4"
+					"--keep-monthly 12"
+					"--keep-yearly 75"
+					"--tag configs"
+				];
+				timerConfig = {
+					OnCalendar = "*-*-* 0,6,12,18:00:00";
+					Persistent = "true";
+				};
+				extraBackupArgs = [ "--tag configs" ];
+			};
+		};
+
+		timesyncd.enable = true;
 	};
 
 	system.autoUpgrade = {
@@ -111,36 +142,6 @@ in
 		};
 	};
 	
-	systemd = {
-		services = {
-			backup-configs = {
-				enable = true;
-				path = with pkgs; [ pigz gnutar rclone ];
-				serviceConfig = {
-					Type = "oneshot";
-					User = cfg.username;
-				};
-				description = "Backup home dir and container configuration to cloud storage";
-				script = ''
-					cd ~; tar -cvf - configs build           | pigz | rclone --config=/etc/rclone/rclone.conf rcat ${cfg.backup.backend}/$HOSTNAME/$HOSTNAME-configs.tar.gz
-					cd ~; tar -cvf - *.sh *.yml .bashrc.d mc | pigz | rclone --config=/etc/rclone/rclone.conf rcat ${cfg.backup.backend}/$HOSTNAME/$HOSTNAME-home.tar.gz
-				'';
-			};
-		};
-		timers = {
-			backup-configs = {
-				enable = pkgs.lib.mkDefault true;
-				wantedBy = [ "timers.target" ];
-				description = "Timer to home dir and container configuration to cloud storage";
-				requires = [ "backup-configs.service" ]; # fuck you
-				timerConfig = {
-					OnCalendar = "*-*-* 0,6,12,18:00:00";
-					Unit = "backup-configs.service";
-				};
-			};
-		};
-	};
-
 	# fixes a systemd bug, nixos-rebuild fails on nm-wait-online
 	systemd.services.NetworkManager-wait-online.enable = pkgs.lib.mkForce false;
 	systemd.services.systemd-networkd-wait-online.enable = pkgs.lib.mkForce false;
