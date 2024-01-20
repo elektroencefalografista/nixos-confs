@@ -11,7 +11,7 @@ let
 	cfg = {
 		hostname = "server";
 		username = "drath";
-		linuxVer = "linux_6_1"; # needed for extra kernel modules
+		linuxVer = "linux_6_6"; # needed for extra kernel modules
 		docker = {
 			confDir = "$HOME/configs";
 			storageDir = "/mnt/zpool/.docker-storage";
@@ -19,7 +19,7 @@ let
 		zfs.arcSize = 8*1024;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
-		net.interface_name = "enp6s0"; # breaks on different hardware ugh. predictable names? maybe just dhcp after all
+		eppPreference = "power";
 	};
 in
 
@@ -32,8 +32,9 @@ in
 
 	boot = {
 		blacklistedKernelModules = [ "k10temp" ];
-		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower ];
-		kernelModules = [ "zenpower" ];
+		kernelPackages = pkgs.linuxKernel.packages.${cfg.linuxVer};
+		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
+		kernelModules = [ "zenpower" "it87" ];
 		supportedFilesystems = [ "zfs" "btrfs" ];
 		zfs.extraPools = [ "zpool" ];
 
@@ -50,7 +51,8 @@ in
 			"zfs.zfs_arc_min=0"
 			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}"
 			"initcall_blacklist=acpi_cpufreq_init"
-			"amd_pstate=passive"
+			"amd_pstate=active"
+			"pcie_aspm=force"
 		];
 	};
 
@@ -72,10 +74,14 @@ in
 			pciutils
 			screen
 			zip
+			reptyr
 			lshw
 			git
 			nmap
+			OVMF
 			gnumake
+			qemu
+			qemu-utils
 			lm_sensors
 		];
 		
@@ -110,12 +116,6 @@ in
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
 		firewall.enable = false; # yea no. gotta figure out what ports i need
-		interfaces.${cfg.net.interface_name}.ipv4.addresses = [{ 
-			address = "192.168.1.200";
-			prefixLength = 24;
-		}];
-		defaultGateway = "192.168.1.254";
-		nameservers = [ "192.168.1.1" ];
 	};
 
 
@@ -299,10 +299,22 @@ in
 					Group = pkgs.lib.mkForce "root";
 				};
 			};
+
+			epp-policy = {
+				enable = true;
+				serviceConfig.Type = "oneshot";
+				script = ''
+					for value in {0..15}; do 
+						echo ${cfg.eppPreference} > /sys/devices/system/cpu/cpufreq/policy''${value}/energy_performance_preference
+					done
+				'';
+			};
 		};
 	};
 
 	system.stateVersion = "23.05";
 	system.autoUpgrade.allowReboot = true; # gonna risk it
-	powerManagement.cpuFreqGovernor = "conservative";
+	powerManagement = {
+		cpuFreqGovernor = "powersave";
+	};
 }
