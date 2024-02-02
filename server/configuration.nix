@@ -14,7 +14,7 @@ let
 		linuxVer = "linux_6_6"; # needed for extra kernel modules
 		docker = {
 			confDir = "$HOME/configs";
-			storageDir = "/mnt/zpool/.docker-storage";
+			storageDir = "/mnt/anime/.docker-storage";
 		};
 		zfs.arcSize = 8*1024;
 		mem.swapSize = 2048;
@@ -35,8 +35,8 @@ in
 		kernelPackages = pkgs.linuxKernel.packages.${cfg.linuxVer};
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
 		kernelModules = [ "zenpower" "it87" ];
-		supportedFilesystems = [ "zfs" "btrfs" ];
-		zfs.extraPools = [ "zpool" ];
+		supportedFilesystems = [ "btrfs" ];
+		# zfs.extraPools = [ "zpool" ];
 
 		loader = {
 			systemd-boot.enable = true;
@@ -150,7 +150,7 @@ in
 		};
 
 		"/mnt/anime" = {
-			device = "/mnt/mfs_*:/mnt/zpool";
+			device = "/mnt/mfs_*";
 			fsType = "fuse.mergerfs";
 			options = [ 
 				"defaults" 
@@ -162,7 +162,7 @@ in
 				"minfreespace=10G"
 				"fsname=mfs_pool"
 				"nofail" ];
-			depends = [ "/mnt/zpool" "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
+			depends = [ "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
 			noCheck = true;
 		};
 	};
