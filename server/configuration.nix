@@ -34,7 +34,14 @@ in
 		blacklistedKernelModules = [ "k10temp" ];
 		kernelPackages = pkgs.linuxKernel.packages.${cfg.linuxVer};
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
-		kernelModules = [ "zenpower" "it87" ];
+		kernelModules = [ 
+			"zenpower" 
+			"it87" 
+			# "vfio_pci"
+			# "vfio"
+			# "vfio_iommu_type1"
+        	# "vfio_virqfd"			
+		];
 		supportedFilesystems = [ "btrfs" ];
 		# zfs.extraPools = [ "zpool" ];
 
@@ -53,6 +60,9 @@ in
 			"initcall_blacklist=acpi_cpufreq_init"
 			"amd_pstate=active"
 			"pcie_aspm=force"
+			"amd_iommu=on"
+			# "vfio-pci.ids=10de:1048,10de:0e08"
+			# "video=vesafb:off,efifb:off"
 		];
 	};
 
