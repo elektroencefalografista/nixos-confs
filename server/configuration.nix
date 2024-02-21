@@ -31,11 +31,10 @@ in
 	];
 
 	boot = {
-		blacklistedKernelModules = [ "k10temp" ];
+		# blacklistedKernelModules = [ "k10temp" ];
 		kernelPackages = pkgs.linuxKernel.packages.${cfg.linuxVer};
-		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ zenpower it87 ];
-		kernelModules = [ 
-			"zenpower" 
+		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ it87 ];
+		kernelModules = [
 			"it87" 
 			# "vfio_pci"
 			# "vfio"
