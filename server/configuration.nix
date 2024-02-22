@@ -300,7 +300,7 @@ in
 						client_id = "telefraf";
 						username = "telegraf";
 						password = "ukVDMfkJX7tjh/sR7Vl6";
-						data_format = "json";
+						data_format = "msgpack";
 						batch = true;
 					};
 				};
@@ -320,18 +320,6 @@ in
 					User = pkgs.lib.mkForce "root";
 					Group = pkgs.lib.mkForce "root";
 				};
-			};
-
-			epp-policy = {
-				enable = true;
-				serviceConfig.Type = "oneshot";
-				script = ''
-					for value in {0..15}; do 
-						echo ${cfg.eppPreference} > /sys/devices/system/cpu/cpufreq/policy''${value}/energy_performance_preference
-					done
-					echo 1 > /sys/devices/platform/it87.656/hwmon/hwmon1/pwm3_enable
-					echo 0 > /sys/devices/platform/it87.656/hwmon/hwmon1/pwm3
-				'';
 			};
 		};
 	};
