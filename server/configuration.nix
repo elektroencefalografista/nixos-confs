@@ -71,6 +71,27 @@ in
 				mode = "0644";
 				source = "/home/${cfg.username}/.config/rclone/rclone.conf";
 			};
+
+			"sensors3.conf" = {
+				mode = "0644";
+				text = ''
+					chip "it8655-isa-0290"
+					ignore in0
+					ignore in1
+					ignore in2
+					ignore in3
+					ignore in4
+					ignore in5
+					ignore in6
+					ignore temp1
+					ignore temp2
+					ignore temp3
+					ignore temp4
+					ignore temp5
+					ignore temp6
+					ignore intrusion0
+				'';
+			};
 		};
 
 		systemPackages = with pkgs; [
