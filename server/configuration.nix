@@ -296,12 +296,12 @@ in
 					};
 					mqtt = {
 						servers = [ "192.168.1.1:1883" ];
-						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}";
+						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/";
 						client_id = "telefraf";
 						username = "telegraf";
 						password = "ukVDMfkJX7tjh/sR7Vl6";
-						data_format = "msgpack";
-						batch = true;
+						data_format = "json";
+						layout = "batch";
 					};
 				};
 			};
