@@ -320,11 +320,11 @@ in
 					mqtt = {
 						servers = [ "192.168.1.1:1883" ];
 						qos = 0;
-						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/{{ .Tag \"chip\" }}{{.Tag \"path\" }}{{.Tag \"interface\" }}";
+						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/{{.Tag \"path\" }}";
 						client_id = "telefraf";
 						username = "telegraf";
 						password = "ukVDMfkJX7tjh/sR7Vl6";
-						data_format = "json";
+						data_format = "influx";
 						# layout = "field";
 						layout = "batch";
 					};
