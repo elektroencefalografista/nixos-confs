@@ -277,7 +277,7 @@ in
 					mem = {};
 					cpu = {};
 					sensors = {
-						remove_numbers = false;
+						# remove_numbers = false;
 					};
 					system = {};
 					smart = {
@@ -319,7 +319,8 @@ in
 					};
 					mqtt = {
 						servers = [ "192.168.1.1:1883" ];
-						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/{{ .Tag \"chip\" }}{{.Tag \"path\" }}{{.Tag \"model\" }}{{.Tag \"ID_MODEL\" }}{{.Tag \"interface\" }}";
+						qos = 0;
+						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/{{ .Tag \"chip\" }}{{.Tag \"path\" }}{{.Tag \"interface\" }}";
 						client_id = "telefraf";
 						username = "telegraf";
 						password = "ukVDMfkJX7tjh/sR7Vl6";
