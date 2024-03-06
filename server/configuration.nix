@@ -16,7 +16,7 @@ let
 			confDir = "$HOME/configs";
 			storageDir = "/mnt/anime/.docker-storage";
 		};
-		zfs.arcSize = 8*1024;
+		zfs.arcSize = 16*1024;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
 		eppPreference = "power";
@@ -41,8 +41,8 @@ in
 			# "vfio_iommu_type1"
         	# "vfio_virqfd"			
 		];
-		supportedFilesystems = [ "btrfs" ];
-		# zfs.extraPools = [ "zpool" ];
+		supportedFilesystems = [ "btrfs" "zfs" ];
+		zfs.extraPools = [ "zpool" ];
 
 		loader = {
 			systemd-boot.enable = true;
@@ -345,6 +345,15 @@ in
 					User = pkgs.lib.mkForce "root";
 					Group = pkgs.lib.mkForce "root";
 				};
+			};
+			set-performance-policy = {
+				serviceConfig = {
+					User = pkgs.lib.mkForce "root";
+					Group = pkgs.lib.mkForce "root";
+				};
+				script = ''
+					for value in {0..15}; do echo ${cfg.eppPreference} > /sys/devices/system/cpu/cpufreq/policy''${value}/energy_performance_preference; done
+				'';
 			};
 		};
 	};
