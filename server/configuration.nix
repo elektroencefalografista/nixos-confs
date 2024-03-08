@@ -42,7 +42,7 @@ in
         	# "vfio_virqfd"			
 		];
 		supportedFilesystems = [ "btrfs" "zfs" ];
-		zfs.extraPools = [ "zpool" ];
+		zfs.extraPools = [ "zpool" "zpool_bde" ];
 
 		loader = {
 			systemd-boot.enable = true;
@@ -169,32 +169,22 @@ in
 				"x-systemd.mount-timeout=15" ];
 		};
 
-		"/mnt/mfs_purple" = {
-			device = "/dev/disk/by-uuid/557885a9-7107-43d2-bab8-109a36b351af";
-			fsType = "ext4";
-			options = [ 
-				"relatime" 
-				"nofail"
-				"defaults"
-				"x-systemd.mount-timeout=15" ];
-		};
-
-		"/mnt/anime" = {
-			device = "/mnt/mfs_*";
-			fsType = "fuse.mergerfs";
-			options = [ 
-				"defaults" 
-				"nonempty"
-				"allow_other"
-				"use_ino"
-				"category.create=msplfs"
-				"dropcacheonclose=true"
-				"minfreespace=10G"
-				"fsname=mfs_pool"
-				"nofail" ];
-			depends = [ "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
-			noCheck = true;
-		};
+		# "/mnt/anime" = {
+		# 	device = "/mnt/mfs_*";
+		# 	fsType = "fuse.mergerfs";
+		# 	options = [ 
+		# 		"defaults" 
+		# 		"nonempty"
+		# 		"allow_other"
+		# 		"use_ino"
+		# 		"category.create=msplfs"
+		# 		"dropcacheonclose=true"
+		# 		"minfreespace=10G"
+		# 		"fsname=mfs_pool"
+		# 		"nofail" ];
+		# 	depends = [ "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
+		# 	noCheck = true;
+		# };
 	};
 
 
@@ -213,7 +203,10 @@ in
 		getty.autologinUser = cfg.username;
 		tailscale.enable = true; # still need to join by hand but thats probably fine
 		vscode-server.enable = true;
-		zfs.autoScrub.enable = true;
+		zfs.autoScrub = {
+			enable = true;
+			interval = "weekly";
+		};
 
 		nfs = {
 			server = {
@@ -246,8 +239,25 @@ in
 				map to guest = bad user
 			'';
 			shares = {
-				anime = {
-					path = "/mnt/anime";
+				# anime = {
+				# 	path = "/mnt/anime";
+				# 	"valid users" = "drath";
+				# 	"guest ok" = "no";
+				# 	"read only" = "no";
+				# 	"browseable" = "yes";
+				# 	"create mask" = "0644";
+   				# 	"directory mask" = "0755";
+	  			# 	"force user" = "drath";
+	  				# "force group" = "drath";
+				# };
+				# movies = {
+				# 	path = "/mnt/anime/Jellyfin";
+				# 	"guest ok" = "yes";
+				# 	"read only" = "yes";
+				# 	"browseable" = "yes";
+				# };
+				tmp_zpool_bde = {
+					path = "/mnt/zpool_bde";
 					"valid users" = "drath";
 					"guest ok" = "no";
 					"read only" = "no";
@@ -255,13 +265,26 @@ in
 					"create mask" = "0644";
    					"directory mask" = "0755";
 	  				"force user" = "drath";
-	  				# "force group" = "drath";
 				};
-				movies = {
-					path = "/mnt/anime/Jellyfin";
-					"guest ok" = "yes";
-					"read only" = "yes";
+				tmp_anime = {
+					path = "/mnt/mfs_anime";
+					"valid users" = "drath";
+					"guest ok" = "no";
+					"read only" = "no";
 					"browseable" = "yes";
+					"create mask" = "0644";
+   					"directory mask" = "0755";
+	  				"force user" = "drath";
+				};
+				tmp_share = {
+					path = "/mnt/mfs_share";
+					"valid users" = "drath";
+					"guest ok" = "no";
+					"read only" = "no";
+					"browseable" = "yes";
+					"create mask" = "0644";
+   					"directory mask" = "0755";
+	  				"force user" = "drath";
 				};
 			};
 		};
@@ -359,7 +382,7 @@ in
 	};
 
 	system.stateVersion = "23.05";
-	system.autoUpgrade.allowReboot = true; # gonna risk it
+	system.autoUpgrade.allowReboot = false;
 	powerManagement = {
 		cpuFreqGovernor = "powersave";
 	};
