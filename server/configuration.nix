@@ -168,6 +168,28 @@ in
 			interval = "weekly";
 		};
 
+		restic.backups = {
+			promdb = {
+				passwordFile = "/etc/restic/restic-pw";
+				repositoryFile = "/etc/restic/repository";
+				environmentFile = "/etc/restic/s3Credentials.env";
+				paths = [ "${cfg.docker.storageDir}/promdb"	];
+				pruneOpts = [
+					"--keep-daily 7"
+					"--keep-weekly 4"
+					"--keep-monthly 12"
+					"--keep-yearly 75"
+					"--tag prometheus"
+				];
+				timerConfig = {
+					OnCalendar = "*-*-* 0,6,12,18:00:00";
+					Persistent = "true";
+					RandomizedDelaySec = 30 * 60;
+				};
+				extraBackupArgs = [ "--tag prometheus" ];
+			};
+		};
+
 		# nfs = {
 		# 	server = {
 		# 		enable = true;
