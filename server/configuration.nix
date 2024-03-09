@@ -199,23 +199,23 @@ in
 				map to guest = bad user
 			'';
 			shares = {
-				# anime = {
-				# 	path = "/mnt/anime";
-				# 	"valid users" = "drath";
-				# 	"guest ok" = "no";
-				# 	"read only" = "no";
-				# 	"browseable" = "yes";
-				# 	"create mask" = "0644";
-   				# 	"directory mask" = "0755";
-	  			# 	"force user" = "drath";
-	  				# "force group" = "drath";
-				# };
-				# movies = {
-				# 	path = "/mnt/anime/Jellyfin";
-				# 	"guest ok" = "yes";
-				# 	"read only" = "yes";
-				# 	"browseable" = "yes";
-				# };
+				anime = {
+					path = "/mnt/anime";
+					"valid users" = "drath";
+					"guest ok" = "no";
+					"read only" = "no";
+					"browseable" = "yes";
+					"create mask" = "0644";
+   					"directory mask" = "0755";
+	  				"force user" = "drath";
+	  				"force group" = "drath";
+				};
+				movies = {
+					path = "/mnt/anime/Jellyfin";
+					"guest ok" = "yes";
+					"read only" = "yes";
+					"browseable" = "yes";
+				};
 			};
 		};
 
