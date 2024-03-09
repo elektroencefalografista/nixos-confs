@@ -3,6 +3,24 @@ networking.useDHCP = true;							# set by default
 i18n.extraLocaleSettings.LC_TIME = "pl_PL.UTF-8";	# just sets the time format
 console.keyMap = "pl2";								# not using console all that much
 
+fileSystems = {
+		"/mnt/anime" = {
+			device = "/mnt/mfs_*";
+			fsType = "fuse.mergerfs";
+			options = [ 
+				"defaults" 
+				"nonempty"
+				"allow_other"
+				"use_ino"
+				"category.create=mspmfs"
+				"dropcacheonclose=true"
+				"minfreespace=10G"
+				"fsname=mfs_pool"
+				"nofail" ];
+			depends = [ "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
+			noCheck = true;
+		};
+	};
 
 		# tsdb path is hardcoded to be under /var/lib, have to use docker
 		services.prometheus = {

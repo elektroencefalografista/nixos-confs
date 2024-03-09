@@ -14,7 +14,7 @@ let
 		linuxVer = "linux_6_6"; # needed for extra kernel modules
 		docker = {
 			confDir = "$HOME/configs";
-			storageDir = "/mnt/anime/.docker-storage";
+			storageDir = "/mnt/docker";
 		};
 		zfs.arcSize = 16*1024;
 		mem.swapSize = 2048;
@@ -41,8 +41,8 @@ in
 			# "vfio_iommu_type1"
         	# "vfio_virqfd"			
 		];
-		supportedFilesystems = [ "btrfs" "zfs" ];
-		zfs.extraPools = [ "zpool" "zpool_bde" ];
+		supportedFilesystems = [ "zfs" ];
+		zfs.extraPools = [ "zpool" ];
 
 		loader = {
 			systemd-boot.enable = true;
@@ -99,7 +99,7 @@ in
 			restic
 			wget
 			ffmpeg
-			mergerfs
+			# mergerfs
 			curl
 			pciutils
 			screen
@@ -145,46 +145,6 @@ in
 		networkmanager.enable = true;
 		firewall.checkReversePath = "loose"; # suggested for tailscale
 		firewall.enable = false; # yea no. gotta figure out what ports i need
-	};
-
-
-	fileSystems = {
-		"/mnt/mfs_share" = {
-			device = "/dev/disk/by-uuid/cdb15f8d-7a83-4b33-aaf7-e4147261900a";
-			fsType = "btrfs";
-			options = [ 
-				"relatime" 
-				"nofail"
-				"defaults"
-				"x-systemd.mount-timeout=15" ];
-		};
-
-		"/mnt/mfs_anime" = {
-			device = "/dev/disk/by-uuid/f4ecfce7-0ff2-4f1f-9709-de874618fe58";
-			fsType = "btrfs";
-			options = [ 
-				"relatime" 
-				"nofail"
-				"defaults"
-				"x-systemd.mount-timeout=15" ];
-		};
-
-		# "/mnt/anime" = {
-		# 	device = "/mnt/mfs_*";
-		# 	fsType = "fuse.mergerfs";
-		# 	options = [ 
-		# 		"defaults" 
-		# 		"nonempty"
-		# 		"allow_other"
-		# 		"use_ino"
-		# 		"category.create=msplfs"
-		# 		"dropcacheonclose=true"
-		# 		"minfreespace=10G"
-		# 		"fsname=mfs_pool"
-		# 		"nofail" ];
-		# 	depends = [ "/mnt/mfs_anime" "/mnt/mfs_share" "/mnt/mfs_purple"];
-		# 	noCheck = true;
-		# };
 	};
 
 
@@ -256,39 +216,8 @@ in
 				# 	"read only" = "yes";
 				# 	"browseable" = "yes";
 				# };
-				tmp_zpool_bde = {
-					path = "/mnt/zpool_bde";
-					"valid users" = "drath";
-					"guest ok" = "no";
-					"read only" = "no";
-					"browseable" = "yes";
-					"create mask" = "0644";
-   					"directory mask" = "0755";
-	  				"force user" = "drath";
-				};
-				tmp_anime = {
-					path = "/mnt/mfs_anime";
-					"valid users" = "drath";
-					"guest ok" = "no";
-					"read only" = "no";
-					"browseable" = "yes";
-					"create mask" = "0644";
-   					"directory mask" = "0755";
-	  				"force user" = "drath";
-				};
-				tmp_share = {
-					path = "/mnt/mfs_share";
-					"valid users" = "drath";
-					"guest ok" = "no";
-					"read only" = "no";
-					"browseable" = "yes";
-					"create mask" = "0644";
-   					"directory mask" = "0755";
-	  				"force user" = "drath";
-				};
 			};
 		};
-
 
 		telegraf = {
 			enable = true;
