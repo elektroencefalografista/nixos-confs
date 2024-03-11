@@ -16,7 +16,7 @@ let
 			confDir = "$HOME/configs";
 			storageDir = "/mnt/docker";
 		};
-		zfs.arcSize = 16*1024;
+		zfs.arcSize = 20*1024;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
 		eppPreference = "power";
