@@ -183,7 +183,7 @@ in
 					"--tag prometheus"
 				];
 				timerConfig = {
-					OnCalendar = "*-*-* 0,6,12,18:00:00";
+					OnCalendar = "*-*-* 1:00:00"; # daily at 1am, maybe its enough to back up weekly with db on zfs
 					Persistent = "true";
 					RandomizedDelaySec = 30 * 60;
 				};
