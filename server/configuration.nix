@@ -56,6 +56,7 @@ in
 		kernelParams = [ 
 			"zfs.zfs_arc_min=0"
 			"zfs.zfs_arc_max=${toString (cfg.zfs.arcSize * 1048576)}"
+			"zfs.zfs_txg_timeout=30" # write to drives every 30s
 			"initcall_blacklist=acpi_cpufreq_init"
 			"amd_pstate=active"
 			"pcie_aspm=force"
@@ -259,8 +260,8 @@ in
 						qos = 0;
 						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/{{.Tag \"path\" }}{{.Tag \"interface\" }}";
 						client_id = "telefraf";
-						username = "telegraf";
-						password = "ukVDMfkJX7tjh/sR7Vl6";
+						# username = "telegraf";
+						# password = "ukVDMfkJX7tjh/sR7Vl6";
 						data_format = "json";
 						# layout = "field";
 						layout = "batch";
