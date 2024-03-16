@@ -68,11 +68,6 @@ in
 
 	environment = {
 		etc = {
-			"rclone/rclone.conf" = {
-				mode = "0644";
-				source = "/home/${cfg.username}/.config/rclone/rclone.conf";
-			};
-
 			"sensors3.conf" = {
 				mode = "0644";
 				text = ''
