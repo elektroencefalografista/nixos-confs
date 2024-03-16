@@ -253,7 +253,7 @@ in
 					mqtt = {
 						servers = [ "192.168.1.1:1883" ];
 						qos = 0;
-						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}/{{.Tag \"path\" }}";
+						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}";
 						client_id = "telefraf";
 						# username = "telegraf";
 						# password = "ukVDMfkJX7tjh/sR7Vl6";
