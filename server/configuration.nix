@@ -163,29 +163,6 @@ in
 			enable = true;
 			interval = "weekly";
 		};
-
-		restic.backups = {
-			promdb = {
-				passwordFile = "/etc/restic/restic-pw";
-				repositoryFile = "/etc/restic/repository";
-				environmentFile = "/etc/restic/s3Credentials.env";
-				paths = [ "${cfg.docker.storageDir}/promdb"	];
-				pruneOpts = [
-					"--keep-daily 7"
-					"--keep-weekly 4"
-					"--keep-monthly 12"
-					"--keep-yearly 75"
-					"--tag prometheus"
-				];
-				timerConfig = {
-					OnCalendar = "*-*-* 1:00:00"; # daily at 1am, maybe its enough to back up weekly with db on zfs
-					Persistent = "true";
-					RandomizedDelaySec = 30 * 60;
-				};
-				extraBackupArgs = [ "--tag prometheus" ];
-			};
-		};
-
 		# nfs = {
 		# 	server = {
 		# 		enable = true;
