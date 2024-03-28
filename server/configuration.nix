@@ -99,6 +99,7 @@ in
 			curl
 			pciutils
 			screen
+			sshfs-fuse
 			zip
 			reptyr
 			lshw
@@ -142,6 +143,25 @@ in
 		firewall.checkReversePath = "loose"; # suggested for tailscale
 		firewall.enable = false; # yea no. gotta figure out what ports i need
 	};
+
+	# fileSystems = {
+	# 	"/mnt/rpi_home" = {
+	# 		device = "drath@192.168.1.253:~";
+	# 		fsType = "sshfs";
+	# 		options = [ 
+	# 			"x-systemd.automount"
+	# 			"_netdev"
+	# 			"user"
+	# 			"idmap=user"
+	# 			"transform_symlinks"
+	# 			"identityfile=/home/${ cfg.username }/.ssh/id_rsa"
+	# 			"allow_other"
+	# 			"default_permissions"
+	# 			"uid=1000"
+	# 			"gid=1000"
+	# 		];
+	# 	};
+	# };
 
 
 	swapDevices = [ {
@@ -228,7 +248,7 @@ in
 						metric_version = 2;
 					};
 					mqtt = {
-						servers = [ "192.168.1.1:1883" ];
+						servers = [ "192.168.1.253:1883" ];
 						qos = 0;
 						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}";
 						client_id = "telefraf";
