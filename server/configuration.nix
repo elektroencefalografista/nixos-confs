@@ -81,6 +81,7 @@ in
 			nmap
 			gnumake
 			lm_sensors
+			python311Packages.requests
 		];
 		
 		variables = {
