@@ -31,7 +31,6 @@ in
 	];
 
 	boot = {
-		# blacklistedKernelModules = [ "k10temp" ];
 		kernelPackages = pkgs.linuxKernel.packages.${cfg.linuxVer};
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ it87 ];
 		kernelModules = [
@@ -67,47 +66,20 @@ in
 	};
 
 	environment = {
-		etc = {
-			"sensors3.conf" = {
-				mode = "0644";
-				text = ''
-					chip "it8655-isa-0290"
-					ignore in0
-					ignore in1
-					ignore in2
-					ignore in3
-					ignore in4
-					ignore in5
-					ignore in6
-					ignore temp1
-					ignore temp2
-					ignore temp3
-					ignore temp4
-					ignore temp5
-					ignore temp6
-					ignore intrusion0
-				'';
-			};
-		};
-
 		systemPackages = with pkgs; [
 			vim
 			restic
 			wget
 			ffmpeg
-			# mergerfs
 			curl
 			pciutils
 			screen
-			sshfs-fuse
 			zip
 			reptyr
 			lshw
 			git
 			nmap
 			gnumake
-			qemu
-			qemu-utils
 			lm_sensors
 		];
 		
@@ -144,26 +116,6 @@ in
 		firewall.enable = false; # yea no. gotta figure out what ports i need
 	};
 
-	# fileSystems = {
-	# 	"/mnt/rpi_home" = {
-	# 		device = "drath@192.168.1.253:~";
-	# 		fsType = "sshfs";
-	# 		options = [ 
-	# 			"x-systemd.automount"
-	# 			"_netdev"
-	# 			"user"
-	# 			"idmap=user"
-	# 			"transform_symlinks"
-	# 			"identityfile=/home/${ cfg.username }/.ssh/id_rsa"
-	# 			"allow_other"
-	# 			"default_permissions"
-	# 			"uid=1000"
-	# 			"gid=1000"
-	# 		];
-	# 	};
-	# };
-
-
 	swapDevices = [ {
    		device = "/var/lib/swapfile";
     	size = cfg.mem.swapSize;
@@ -175,6 +127,22 @@ in
 		listenOptions = [ "/run/docker.sock" "0.0.0.0:2375"  ];
 	};
 
+	virtualisation.libvirtd = {
+		enable = true;
+		qemu = {
+			package = pkgs.qemu_kvm;
+			runAsRoot = true;
+			swtpm.enable = true;
+			ovmf = {
+				enable = true;
+				# packages = [(pkgs.unstable.OVMF.override {
+				# 	secureBoot = true;
+				# 	tpmSupport = true;
+				# }).fd];
+			};
+		};
+	};
+
 	services = {
 		getty.autologinUser = cfg.username;
 		tailscale.enable = true; # still need to join by hand but thats probably fine
@@ -183,19 +151,6 @@ in
 			enable = true;
 			interval = "weekly";
 		};
-		# nfs = {
-		# 	server = {
-		# 		enable = true;
-		# 		exports = ''
-		# 			/mnt 192.168.1.0/24(ro,fsid=0,no_subtree_check) 100.0.0.0/8(ro,fsid=0,no_subtree_check)
-		# 			/mnt/anime 192.168.1.0/24(rw,fsid=1,sync,no_subtree_check,crossmnt) 100.0.0.0/8(rw,fsid=1,sync,no_subtree_check,crossmnt)
-		# 		'';
-		# 	};
-		# 	extraConfig = ''
-		# 		[nfsd]
-		# 		vers3=n
-		# 	'';
-		# };
 
 		telegraf = {
 			enable = true;
@@ -241,10 +196,10 @@ in
 				outputs = {
 					prometheus_client = {
 						listen = ":9273";
-						# ip_range = [ 
-						# 	"192.168.1.0/24"
-						# 	"127.0.0.0/24"
-						# ];
+						ip_range = [ 
+							"192.168.1.0/24"
+							"127.0.0.0/24"
+						];
 						metric_version = 2;
 					};
 					mqtt = {
@@ -252,17 +207,12 @@ in
 						qos = 0;
 						topic = "telegraf/{{ .Hostname }}/{{ .PluginName }}";
 						client_id = "telefraf";
-						# username = "telegraf";
-						# password = "ukVDMfkJX7tjh/sR7Vl6";
 						data_format = "json";
-						# layout = "field";
 						layout = "batch";
 					};
 				};
 			};
 		};
-
-		# probably should move to common
 	};
 
 	
@@ -276,21 +226,14 @@ in
 					Group = pkgs.lib.mkForce "root";
 				};
 			};
-			set-performance-policy = {
-				serviceConfig = {
-					User = pkgs.lib.mkForce "root";
-					Group = pkgs.lib.mkForce "root";
-				};
-				script = ''
-					for value in {0..15}; do echo ${cfg.eppPreference} > /sys/devices/system/cpu/cpufreq/policy''${value}/energy_performance_preference; done
-				'';
-			};
 		};
 	};
 
+	powerManagement.cpuFreqGovernor = "powersave";
 	system.stateVersion = "23.05";
-	system.autoUpgrade.allowReboot = false;
-	powerManagement = {
-		cpuFreqGovernor = "powersave";
+	system.autoUpgrade = {
+		allowReboot = false;
+		enable = true;
 	};
+	
 }
