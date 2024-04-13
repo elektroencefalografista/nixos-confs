@@ -16,7 +16,7 @@ let
 			confDir = "$HOME/configs";
 			storageDir = "/mnt/docker";
 		};
-		zfs.arcSize = 20*1024;
+		zfs.arcSize = 12*1024;
 		mem.swapSize = 2048;
 		oneshotConfigDownloaderSource = "server";
 		eppPreference = "power";
@@ -35,10 +35,10 @@ in
 		extraModulePackages = with pkgs.linuxKernel.packages.${cfg.linuxVer}; [ it87 ];
 		kernelModules = [
 			"it87" 
-			# "vfio_pci"
-			# "vfio"
-			# "vfio_iommu_type1"
-        	# "vfio_virqfd"			
+			"vfio_pci"
+			"vfio"
+			"vfio_iommu_type1"
+        	"vfio_virqfd"			
 		];
 		supportedFilesystems = [ "zfs" ];
 		zfs.extraPools = [ "zpool" ];
@@ -60,8 +60,8 @@ in
 			"amd_pstate=active"
 			"pcie_aspm=force"
 			"amd_iommu=on"
-			# "vfio-pci.ids=10de:1048,10de:0e08"
-			# "video=vesafb:off,efifb:off"
+			"vfio-pci.ids=1002:ab38,1002:731f"
+			"video=vesafb:off,efifb:off"
 		];
 	};
 
